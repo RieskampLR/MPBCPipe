@@ -36,9 +36,13 @@ from pathlib import Path
 # Storing Paths of arguments in variables:
     
 qdat = pd.read_csv(Path(sys.argv[1])) # questionnaire data
-pdat = pd.read_table(Path(sys.argv[2]), encoding='unicode_escape') # pharmacy data              -------------DataFrame.to_csv?
-hdat = pd.read_table(Path(sys.argv[3]), encoding='unicode_escape') # hospital data
-vdat = pd.read_table(Path(sys.argv[4]), encoding='unicode_escape') # visits data
+pdat = pd.read_table(Path(sys.argv[2]), encoding='unicode_escape') # pharmacy data
+hdat = pd.read_table(Path(sys.argv[3]), encoding='unicode_escape', low_memory=False) # hospital data
+vdat = pd.read_table(Path(sys.argv[4]), encoding='unicode_escape', low_memory=False) # visits data
+
+print(hdat)
+print (hdat[0:1])
+print(hdat["FLAND"])
 
 
 # Input file checks
