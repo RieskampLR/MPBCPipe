@@ -83,7 +83,6 @@ with open(json_file_conds) as json_file:
 
 
 # filter IDs by condition
-#ids = tables["qdat"].loc[tables["qdat"][cond["qdat"]["column"]] == cond["qdat"]["value"], "StudieID"]
 
 filters = cond["qdat"]["filters"]
 
@@ -103,82 +102,16 @@ result = {}
 
 for table, cols in categories.items():
     df = tables[table]
-    result[table] = df[df["StudieID"].isin(ids)][["StudieID"] + cols]
+    result[table] = df[df["StudieID"].isin(ids)][cols].assign(StudieID=df["StudieID"])
 
 print(result)
 
+
+
 # merge to one table for neat output
+thetable = result["pdat"].merge(result["qdat"], on="StudieID", how="outer")
 
 
-
-
-
-
-'''
-# old-ish
-
-# Coloumns user-requested
-
-# Which cols to even include in thetable
-
-with open(json_file, "r") as json_file:
-    categories = json.load(json_file)
-
-print(categories)
-
-# get each data sets headers to lists
-for name, values in categories.items():
-    globals()[name] = values
-
-
-pdat = pdat[pdat_cats]
-
-thetable = pdat.merge(qdat[qdat_cats], on="StudieID", how="left")
-
-
-'''
-
-    
-
-''' old
-
-# Empty table
-thetable = pd.DataFrame(columns=pd.MultiIndex.from_tuples([(k, v) for k, vals in categories.items() for v in vals]))
-
-# Fill table with data from loaded pandas tables
-    
-for name, cols in categories.items():
-    for col in cols:
-        thetable[(name, col)] = globals()[name][col].values
-
-other old:
-
-# categories is a dictionary looking like:
-# {"comorbidities": ["Diabetes", "Epilepsy", "VascularD", "Depression"],
-#  "diagnosis info": ["main", "main_date", "parkinsons", "age_at_diagnosis"]}
-
-
-
-
-
-# List of diagnoses present in data sets
-
-diagnoses = []
-for col in hdat.loc[:,"DIA1":]:     # loops over dia coloumns
-    for dia in hdat[col]:           # loops over the current column entries
-        if not pd.isna(dia):        # excludes empty entries
-            if dia not in diagnoses:
-                diagnoses.append(dia)
-#print(diagnoses)
-
-
-
-
-# Combine data to one table
-
-thetable = 
-
-'''
 
 
 
