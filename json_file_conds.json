@@ -1,0 +1,9 @@
+{
+  "qdat": {
+    "filters": {
+      "Hoehn_Yahr": [3, 4],
+      "Age_Diagnosis": [60, 70]
+    }
+  }
+}
+

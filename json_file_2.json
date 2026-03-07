@@ -1,0 +1,11 @@
+{
+  "pdat": 
+  ["StudieID", 
+  "produkt",
+  "AR"
+  ],
+  "qdat":
+  ["StudieID",
+  "Age_Diagnosis",
+  "Hoehn_Yahr"]
+}
