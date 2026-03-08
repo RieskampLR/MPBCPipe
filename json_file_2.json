@@ -2,7 +2,8 @@
   "pdat": 
   ["StudieID", 
   "produkt",
-  "AR"
+  "AR",
+  "ANTAL"
   ],
   "qdat":
   ["StudieID",

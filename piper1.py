@@ -84,16 +84,18 @@ with open(json_file_conds) as json_file:
 
 # filter IDs by condition
 
-filters = cond["qdat"]["filters"]
+id_selection = {}
 
-ids = tables["qdat"]
-for col, val in filters.items():
-    if len(val) == 2:  # range
-        ids = ids[ids[col].between(*val)]
-    else:            # list of allowed values
-        ids = ids[ids[col].isin(val)]
+for table in tables:
+    filters = cond[table]
+    ids = tables[table]
+    for col, val in filters.items():
+        if val["type"] == "range":
+            ids = ids[ids[col].between(*val["values"])]
+        else:
+            ids = ids[ids[col].isin(val["values"])]
+    id_selection[table] = ids["StudieID"]
 
-ids = ids["StudieID"]
 
 
 
@@ -102,16 +104,17 @@ result = {}
 
 for table, cols in categories.items():
     df = tables[table]
-    result[table] = df[df["StudieID"].isin(ids)][cols].assign(StudieID=df["StudieID"])
+    result[table] = df[df["StudieID"].isin(id_selection[table])][["StudieID"] + [c for c in cols if c != "StudieID"]]
 
 print(result)
 
 
-
 # merge to one table for neat output
+
 thetable = result["pdat"].merge(result["qdat"], on="StudieID", how="outer")
+# nan for qdat vals where no entries in qdat for IDs that are present in pdat
 
-
+print(thetable)
 
 
 
