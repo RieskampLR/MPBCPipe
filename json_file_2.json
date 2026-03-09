@@ -8,5 +8,8 @@
   "qdat":
   ["StudieID",
   "Age_Diagnosis",
-  "Hoehn_Yahr"]
+  "Hoehn_Yahr"],
+  "hdat":
+  ["hdia"],
+  "vdat": []
 }

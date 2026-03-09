@@ -86,7 +86,7 @@ vdat_anonym["StudieID"] = vdat_anonym["StudieID"].replace(id_dictionary)
 id_dic_pdtable = pd.DataFrame.from_dict(id_dictionary, orient="index")
 id_dic_pdtable.to_csv("id_anonymised_dictionary.txt", sep='\t', header=False)
 
-qdat_anonym.to_csv("qdat_anonymised.tsv", sep='\t', index=False, index_label=None, na_rep='NA',)
+qdat_anonym.to_csv("qdat_anonymised.tsv", sep='\t', index=False, index_label=None, na_rep='NA')
 
 pdat_anonym.to_csv("pdat_anonymised.tsv", sep='\t', index=False)
 

@@ -6,7 +6,9 @@
   "pdat": {
 	  "ANTAL": {"type": "range", "values": [1, 3]}
   },
-  "hdat": {},
+  "hdat": {
+	  "hdia": {"type": "string", "values":["G20"]}
+  },
   "vdat": {}
 }
 
