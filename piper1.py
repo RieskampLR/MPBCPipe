@@ -7,6 +7,11 @@ piper1.py
 
 Description:
 
+Additional info/columns provided:
+    qdat:
+        Doctoral_diagnoses_at_inclusion_+-1year
+        Doctoral_diagnoses_recorded_till_inclusion_+1year
+        Doctoral_diagnoses_received_after_inclusion_year
 
 Hard-code conditions:
 - Header entries / short codes have to be named the same in any new data collection files
@@ -32,9 +37,10 @@ Author: Lea Rachel Rieskamp
 # Imports:
 
 import sys
-import pandas as pd
 from pathlib import Path
 import json
+import pandas as pd
+import numpy as np
 
 
 # Storing Paths of arguments in variables:
@@ -60,8 +66,76 @@ json_file_conds = Path("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/js
 # ...
   
 
+# Formatting and additional coloumns prep
 
 qdat = qdat.rename(columns={"Id": "StudieID"})
+
+
+# Participants with diagnosis at inclusion +-1
+
+# IDs where INDATUMA == Inclusion_Year +- 1
+year = qdat.set_index("StudieID")["Inclusion_Year"].astype(int)
+
+ids_atInc = pd.concat([
+    hdat.loc[(hdat["INDATUMA"].astype(str).str[:4].astype(int) - hdat["StudieID"].map(year)).abs() <= 1, "StudieID"],
+    vdat.loc[(vdat["INDATUMA"].astype(str).str[:4].astype(int) - vdat["StudieID"].map(year)).abs() <= 1, "StudieID"]
+]).unique()
+
+
+ids_tillInc = pd.concat([
+    hdat.loc[hdat["INDATUMA"].astype(str).str[:4].astype(int) <= hdat["StudieID"].map(year) + 1, "StudieID"],
+    vdat.loc[vdat["INDATUMA"].astype(str).str[:4].astype(int) <= vdat["StudieID"].map(year) + 1, "StudieID"]
+]).unique()
+# Includes diagnoses recorded at inclusion and inclusion + 1 year
+
+
+ids_afterInc = pd.concat([
+    hdat.loc[hdat["INDATUMA"].astype(str).str[:4].astype(int) > hdat["StudieID"].map(year), "StudieID"],
+    vdat.loc[vdat["INDATUMA"].astype(str).str[:4].astype(int) > vdat["StudieID"].map(year), "StudieID"]
+]).unique()
+ids_afterInc = np.setdiff1d(ids_afterInc, ids_tillInc)
+
+
+
+col_names = ["Doctoral_diagnoses_received_after_inclusion_year", "Doctoral_diagnoses_at_inclusion_+-1year", "Doctoral_diagnoses_recorded_till_inclusion_+1year"]
+counter = 0
+
+for ids in [ids_atInc, ids_tillInc, ids_afterInc]:
+
+    # get diagnoses for these
+    cols = ["StudieID"] + ["hdia"] + [c for c in hdat.columns if c.startswith("DIA") and c!= "DIA_ANT"]
+    doc_combined = pd.concat([hdat, vdat], ignore_index=True)
+    result = doc_combined.loc[doc_combined["StudieID"].isin(ids), cols]
+    
+    # To 1 coloumn
+    col_name = col_names[counter]
+    counter = counter + 1
+    result[col_name] = (
+        result.drop(columns="StudieID").fillna("").astype(str).agg(",".join, axis=1)
+        .str.replace(r"(,+)", ",", regex=True).str.strip(","))
+    result = result[["StudieID", col_name]]
+    
+    # Each patient once (diagnoses fused)
+    result = result.groupby("StudieID", as_index=False).agg({col_name: ",".join})
+    
+    for i, entry in enumerate(result [col_name]):
+        diagnoses = entry.split(",")
+        cut = set(diagnoses)
+        result.at[i, col_name] = ",".join(sorted(cut)) # replace entry
+    
+    # Add to qdat table
+    qdat = qdat.merge(result, on="StudieID", how="left")
+    #qdat = pd.concat([qdat.iloc[:, :5], result.drop(columns="StudieID"), qdat.iloc[:, 5:]], axis=1) # move column to 6th position
+    qdat.insert(5 + counter - 1, col_name, qdat.pop(col_name))
+
+
+qdat = qdat.copy() # removes saved memory of column movement
+
+#diff_entries = qdat[qdat.iloc[:, 5] != qdat.iloc[:, 6]]
+
+
+
+# -----------------------------------------------------------------------------
 
 
 # tables dic
