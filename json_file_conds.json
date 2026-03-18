@@ -1,7 +1,8 @@
 {
   "qdat": {
     "Hoehn_Yahr": {"type": "values", "values": [3, 4]},
-    "Age_Diagnosis": {"type": "range", "values": [60, 70]}
+    "Age_Diagnosis": {"type": "range", "values": [60, 70]},
+	"Doctoral_diagnoses_received_after_inclusion_year": {"type": "string", "values": ["E11"]}
   },
   "pdat": {
 	  "ANTAL": {"type": "range", "values": [1, 3]}

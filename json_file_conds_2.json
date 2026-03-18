@@ -1,0 +1,10 @@
+{
+  "qdat": {
+	"Doctoral_diagnoses_received_after_inclusion_year": {"type": "string", "values": ["any"]}
+  },
+  "pdat": {
+  },
+  "hvdat": {
+	  "hdia": {"type": "string", "values":["any"]}
+  }
+}

@@ -8,7 +8,9 @@
   "qdat":
   ["StudieID",
   "Age_Diagnosis",
-  "Hoehn_Yahr"],
+  "Hoehn_Yahr",
+  "Doctoral_diagnoses_received_after_inclusion_year"
+  ],
   "hdat":
   ["hdia"],
   "vdat": []
