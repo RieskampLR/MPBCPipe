@@ -38,6 +38,7 @@ Author: Lea Rachel Rieskamp
 
 import sys
 from pathlib import Path
+import argparse
 import json
 import pandas as pd
 import numpy as np
@@ -45,7 +46,7 @@ import numpy as np
 
 # Storing Paths of arguments in variables:
 
-"""
+
 qdat = pd.read_csv(Path(sys.argv[1]), sep="\t") # questionnaire data
 pdat = pd.read_table(Path(sys.argv[2]), encoding='unicode_escape') # pharmacy data
 hdat = pd.read_table(Path(sys.argv[3]), encoding='unicode_escape', low_memory=False) # hospital data
@@ -60,7 +61,7 @@ hdat = pd.read_table(Path("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats
 vdat = pd.read_table(Path("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/vdat_anonymised.tsv"), encoding='unicode_escape', low_memory=False)
 json_file_cats = Path("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/json_file_2.json")
 json_file_conds = Path("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/json_file_conds_2.json")
-
+"""
 
 # Input file checks
 # ...
@@ -94,7 +95,7 @@ with open(json_file_conds) as json_file:
 
 col_names = ["Doctoral_diagnoses_received_after_inclusion_year", "Doctoral_diagnoses_at_inclusion_+-1year", "Doctoral_diagnoses_recorded_till_inclusion_+1year"]
 
-if any(col in categories["qdat"] for col in col_names):
+if any(col in categories["qdat"] or col in cond["qdat"] for col in col_names):
 
     # Participants with diagnosis at inclusion +-1
     
@@ -191,7 +192,12 @@ for table in tables:
     ids = tables[table]
     for col, val in filters.items():
         if val["type"] == "range":
-            ids = ids[ids[col].between(*val["values"])]
+            if val["values"][0] == ">=":
+                ids = ids[ids[col] >= val["values"][1]]
+            elif val["values"][0] == "<=":
+                ids = ids[ids[col] <= val["values"][1]]
+            else:
+                ids = ids[ids[col].between(*val["values"])]
         elif val["type"] == "string":
             if val["values"] == ["any"]:
                 ids = ids[ids[col].notna()]
@@ -237,6 +243,24 @@ thetable = result["pdat"].merge(result["hdat"], on="StudieID", how="outer") \
                         .merge(result["vdat"], on="StudieID", how="outer") \
                         .merge(result["qdat"], on="StudieID", how="outer")
 # nan for qdat vals where no entries in qdat for IDs that are present in pdat
+
+
+# Sort output-table flag
+
+# Set up argument parser
+#sort_flag = argparse.ArgumentParser(description="Specify columns to sort by")
+#sort_flag.add_argument("-s", "--sort", type=str, nargs="+", help="Column to sort by")
+#args = sort_flag.parse_args() # reads all arguments from command line in
+#sort_cols = args.sort  # variable (list) for the sort argument string
+
+
+# sort format thetable
+
+sort_cols = ["Age_Diagnosis", "StudieID"]
+
+thetable = thetable.sort_values(by=sort_cols)
+
+# thetable = thetable.drop_duplicates()
 
 
 #print(thetable)

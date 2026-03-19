@@ -1,6 +1,6 @@
 {
   "qdat": {
-	"Doctoral_diagnoses_received_after_inclusion_year": {"type": "string", "values": ["any"]}
+	"Doctoral_diagnoses_at_inclusion_+-1year": {"type": "string", "values": ["any"]}
   },
   "pdat": {
   },
