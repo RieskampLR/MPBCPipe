@@ -36,32 +36,49 @@ Author: Lea Rachel Rieskamp
 
 # Imports:
 
-import sys
 from pathlib import Path
 import argparse
 import json
 import pandas as pd
 import numpy as np
-
-
+import warnings
 # Storing Paths of arguments in variables:
 
+warnings.simplefilter("ignore", category=pd.errors.PerformanceWarning)
 
-qdat = pd.read_csv(Path(sys.argv[1]), sep="\t") # questionnaire data
-pdat = pd.read_table(Path(sys.argv[2]), encoding='unicode_escape') # pharmacy data
-hdat = pd.read_table(Path(sys.argv[3]), encoding='unicode_escape', low_memory=False) # hospital data
-vdat = pd.read_table(Path(sys.argv[4]), encoding='unicode_escape', low_memory=False) # visits data
-json_file_cats = Path(sys.argv[5]) # json file for user's coloumn selections
-json_file_conds = Path(sys.argv[6])
+"""
+# Set up argument parser
+parser = argparse.ArgumentParser(description="Specify input files and optionally columns to sort by")
+parser.add_argument("qdat")
+parser.add_argument("pdat")
+parser.add_argument("hdat")
+parser.add_argument("vdat")
+parser.add_argument("json_file_cats")
+parser.add_argument("json_file_conds")
+parser.add_argument("-s", "--sort", type=str, nargs="+", help="Column to sort by")
+args = parser.parse_args()
+
+# Use args instead of sys.argv
+qdat = pd.read_csv(Path(args.qdat), sep="\t")
+pdat = pd.read_table(Path(args.pdat), encoding='unicode_escape')
+hdat = pd.read_table(Path(args.hdat), encoding='unicode_escape', low_memory=False)
+vdat = pd.read_table(Path(args.vdat), encoding='unicode_escape', low_memory=False)
+json_file_cats = Path(args.json_file_cats)
+json_file_conds = Path(args.json_file_conds)
+
+sort_cols = args.sort
+
+
+
 """
 
 qdat = pd.read_table(Path("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/qdat_anonymised.tsv"))
 pdat = pd.read_table(Path("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/pdat_anonymised.tsv"), encoding='unicode_escape')
 hdat = pd.read_table(Path("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/hdat_anonymised.tsv"), encoding='unicode_escape', low_memory=False)
 vdat = pd.read_table(Path("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/vdat_anonymised.tsv"), encoding='unicode_escape', low_memory=False)
-json_file_cats = Path("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/json_file_2.json")
-json_file_conds = Path("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/json_file_conds_2.json")
-"""
+json_file_cats = Path("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/json_file_cats_3.json")
+json_file_conds = Path("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/json_file_conds_3.json")
+
 
 # Input file checks
 # ...
@@ -88,8 +105,8 @@ with open(json_file_conds) as json_file:
 
 
 #------------------------------------------------------------------------------
-
-# Additional info coloumns
+# Additional info coloumns generation
+#------------------------------------------------------------------------------
 
 # Diagnosis time vs inclusion time
 
@@ -161,8 +178,8 @@ if any(col in categories["qdat"] or col in cond["qdat"] for col in col_names):
 
 
 # -----------------------------------------------------------------------------
-
 # Filtering for user-defined conditions
+#------------------------------------------------------------------------------
 
 
 # tables dic
@@ -178,9 +195,6 @@ cat_tables = {
     "hdat": hdat,
     "vdat": vdat
 }
-
-
-
 
 
 # filter IDs by condition based on json file
@@ -220,6 +234,8 @@ common_ids = set.intersection(*(set(ids) for ids in id_selection.values()))
 
 
 # -----------------------------------------------------------------------------
+# Output table generation and formattig
+#------------------------------------------------------------------------------
 
 # Filtering for user-defined output table categories
 
@@ -245,14 +261,52 @@ thetable = result["pdat"].merge(result["hdat"], on="StudieID", how="outer") \
 # nan for qdat vals where no entries in qdat for IDs that are present in pdat
 
 
-# Sort output-table flag
 
-# Set up argument parser
-#sort_flag = argparse.ArgumentParser(description="Specify columns to sort by")
-#sort_flag.add_argument("-s", "--sort", type=str, nargs="+", help="Column to sort by")
-#args = sort_flag.parse_args() # reads all arguments from command line in
-#sort_cols = args.sort  # variable (list) for the sort argument string
+#------------------------------------------------------------------------------
+# Optional table transformations
+#------------------------------------------------------------------------------
 
+# by pharma product pick up
+
+grouped = pdat[pdat["StudieID"].isin(common_ids)].groupby(["StudieID","produkt"])
+
+produkt_info_rows = []
+
+for (stu_id, prod), group in grouped:
+    dates = group["EDATUM"].tolist()   # all pickup dates for this ID+produkt
+    count = len(dates)               # number of pickups
+    produkt_info_rows.append([stu_id, prod, count] + dates)
+
+pharma_summary = pd.DataFrame(produkt_info_rows)
+pharma_summary.columns = ["StudieID", "produkt", "number_of_pickups"] + list(pharma_summary.columns[3:])
+
+pharma_cols = pharma_summary.columns.tolist()
+for i in range(3, len(pharma_summary.columns)):
+    pharma_cols[i] = f'Date_{i-2}'
+pharma_summary.columns = pharma_cols
+
+date_cols = pharma_summary.columns[3:]
+
+pharma_summary[date_cols] = pharma_summary[date_cols].apply(pd.to_datetime, errors='coerce')
+pharma_summary["min_date"] = pharma_summary[date_cols].min(axis=1)
+pharma_summary["max_date"] = pharma_summary[date_cols].max(axis=1)
+
+for col in list(date_cols) + ["min_date", "max_date"]:
+    pharma_summary[col] = pharma_summary[col].dt.strftime("%Y-%m-%d")
+
+
+pharma_summary.insert(3, "span", np.nan)
+pharma_summary["span"] = pharma_summary["min_date"] + " - " + pharma_summary["max_date"]
+pharma_summary = pharma_summary.drop(columns=["min_date", "max_date"])
+
+
+pharma_summary.to_csv("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/pharma_summary_table.csv",
+                sep='\t', index=False, index_label=None, na_rep='NA')
+
+
+#------------------------------------------------------------------------------
+# Optional table transformations
+#------------------------------------------------------------------------------
 
 # sort format thetable
 
@@ -260,7 +314,8 @@ sort_cols = ["Age_Diagnosis", "StudieID"]
 
 thetable = thetable.sort_values(by=sort_cols)
 
-# thetable = thetable.drop_duplicates()
+
+# thetable = thetable.drop_duplicates() # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Currently for easy look at and speed
 
 
 #print(thetable)
