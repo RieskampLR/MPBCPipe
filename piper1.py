@@ -46,9 +46,9 @@ import warnings
 
 warnings.simplefilter("ignore", category=pd.errors.PerformanceWarning)
 
-"""
+
 # Set up argument parser
-parser = argparse.ArgumentParser(description="Specify input files and optionally columns to sort by")
+parser = argparse.ArgumentParser(description="Specify input files and optionally: Columns to sort by and other summary tables")
 parser.add_argument("qdat")
 parser.add_argument("pdat")
 parser.add_argument("hdat")
@@ -56,6 +56,7 @@ parser.add_argument("vdat")
 parser.add_argument("json_file_cats")
 parser.add_argument("json_file_conds")
 parser.add_argument("-s", "--sort", type=str, nargs="+", help="Column to sort by")
+parser.add_argument("-p", "--pharma", action="store_true", help="Pharma pick ups summary")
 args = parser.parse_args()
 
 # Use args instead of sys.argv
@@ -78,7 +79,7 @@ hdat = pd.read_table(Path("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats
 vdat = pd.read_table(Path("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/vdat_anonymised.tsv"), encoding='unicode_escape', low_memory=False)
 json_file_cats = Path("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/json_file_cats_3.json")
 json_file_conds = Path("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/json_file_conds_3.json")
-
+"""
 
 # Input file checks
 # ...
@@ -268,40 +269,42 @@ thetable = result["pdat"].merge(result["hdat"], on="StudieID", how="outer") \
 
 # by pharma product pick up
 
-grouped = pdat[pdat["StudieID"].isin(common_ids)].groupby(["StudieID","produkt"])
-
-produkt_info_rows = []
-
-for (stu_id, prod), group in grouped:
-    dates = group["EDATUM"].tolist()   # all pickup dates for this ID+produkt
-    count = len(dates)               # number of pickups
-    produkt_info_rows.append([stu_id, prod, count] + dates)
-
-pharma_summary = pd.DataFrame(produkt_info_rows)
-pharma_summary.columns = ["StudieID", "produkt", "number_of_pickups"] + list(pharma_summary.columns[3:])
-
-pharma_cols = pharma_summary.columns.tolist()
-for i in range(3, len(pharma_summary.columns)):
-    pharma_cols[i] = f'Date_{i-2}'
-pharma_summary.columns = pharma_cols
-
-date_cols = pharma_summary.columns[3:]
-
-pharma_summary[date_cols] = pharma_summary[date_cols].apply(pd.to_datetime, errors='coerce')
-pharma_summary["min_date"] = pharma_summary[date_cols].min(axis=1)
-pharma_summary["max_date"] = pharma_summary[date_cols].max(axis=1)
-
-for col in list(date_cols) + ["min_date", "max_date"]:
-    pharma_summary[col] = pharma_summary[col].dt.strftime("%Y-%m-%d")
-
-
-pharma_summary.insert(3, "span", np.nan)
-pharma_summary["span"] = pharma_summary["min_date"] + " - " + pharma_summary["max_date"]
-pharma_summary = pharma_summary.drop(columns=["min_date", "max_date"])
-
-
-pharma_summary.to_csv("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/pharma_summary_table.csv",
-                sep='\t', index=False, index_label=None, na_rep='NA')
+if args.pharma:
+    
+    grouped = pdat[pdat["StudieID"].isin(common_ids)].groupby(["StudieID","produkt"])
+    
+    produkt_info_rows = []
+    
+    for (stu_id, prod), group in grouped:
+        dates = group["EDATUM"].tolist()   # all pickup dates for this ID+produkt
+        count = len(dates)               # number of pickups
+        produkt_info_rows.append([stu_id, prod, count] + dates)
+    
+    pharma_summary = pd.DataFrame(produkt_info_rows)
+    pharma_summary.columns = ["StudieID", "produkt", "number_of_pickups"] + list(pharma_summary.columns[3:])
+    
+    pharma_cols = pharma_summary.columns.tolist()
+    for i in range(3, len(pharma_summary.columns)):
+        pharma_cols[i] = f'Date_{i-2}'
+    pharma_summary.columns = pharma_cols
+    
+    date_cols = pharma_summary.columns[3:]
+    
+    pharma_summary[date_cols] = pharma_summary[date_cols].apply(pd.to_datetime, errors='coerce')
+    pharma_summary["min_date"] = pharma_summary[date_cols].min(axis=1)
+    pharma_summary["max_date"] = pharma_summary[date_cols].max(axis=1)
+    
+    for col in list(date_cols) + ["min_date", "max_date"]:
+        pharma_summary[col] = pharma_summary[col].dt.strftime("%Y-%m-%d")
+    
+    
+    pharma_summary.insert(3, "span", np.nan)
+    pharma_summary["span"] = pharma_summary["min_date"] + " - " + pharma_summary["max_date"]
+    pharma_summary = pharma_summary.drop(columns=["min_date", "max_date"])
+    
+    
+    pharma_summary.to_csv("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/pharma_summary_table.csv",
+                    sep='\t', index=False, index_label=None, na_rep='NA')
 
 
 #------------------------------------------------------------------------------
@@ -310,7 +313,7 @@ pharma_summary.to_csv("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/pha
 
 # sort format thetable
 
-sort_cols = ["Age_Diagnosis", "StudieID"]
+# sort_cols = ["Age_Diagnosis", "StudieID"]
 
 thetable = thetable.sort_values(by=sort_cols)
 
