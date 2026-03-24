@@ -46,7 +46,7 @@ import warnings
 
 warnings.simplefilter("ignore", category=pd.errors.PerformanceWarning)
 
-
+"""
 # Set up argument parser
 parser = argparse.ArgumentParser(description="Specify input files and optionally: Columns to sort by and other summary tables")
 parser.add_argument("qdat")
@@ -67,7 +67,7 @@ vdat = pd.read_table(Path(args.vdat), encoding='unicode_escape', low_memory=Fals
 json_file_cats = Path(args.json_file_cats)
 json_file_conds = Path(args.json_file_conds)
 
-sort_cols = args.sort
+sort_cols = list(args.sort)
 
 
 
@@ -79,7 +79,7 @@ hdat = pd.read_table(Path("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats
 vdat = pd.read_table(Path("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/vdat_anonymised.tsv"), encoding='unicode_escape', low_memory=False)
 json_file_cats = Path("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/json_file_cats_3.json")
 json_file_conds = Path("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/json_file_conds_3.json")
-"""
+
 
 # Input file checks
 # ...
@@ -235,7 +235,7 @@ common_ids = set.intersection(*(set(ids) for ids in id_selection.values()))
 
 
 # -----------------------------------------------------------------------------
-# Output table generation and formattig
+# Output table generation and formatting
 #------------------------------------------------------------------------------
 
 # Filtering for user-defined output table categories
@@ -256,10 +256,38 @@ for table, cols in categories.items():
 
 # merge to one table for neat output
 
-thetable = result["pdat"].merge(result["hdat"], on="StudieID", how="outer") \
-                        .merge(result["vdat"], on="StudieID", how="outer") \
-                        .merge(result["qdat"], on="StudieID", how="outer")
+# Convert all columns except StudieID to string and fill NaN
+for tbl in ["pdat", "hdat", "vdat", "qdat"]:
+    df = result[tbl]
+    for col in df.columns:
+        if col != "StudieID":
+            df[col] = df[col].fillna("").astype(str)
+    result[tbl] = df
+
+# Then aggregate by StudieID
+pdat_agg = result["pdat"].groupby("StudieID", as_index=False).agg(",".join)
+hdat_agg = result["hdat"].groupby("StudieID", as_index=False).agg(",".join)
+vdat_agg = result["vdat"].groupby("StudieID", as_index=False).agg(",".join)
+qdat_agg = result["qdat"].groupby("StudieID", as_index=False).agg(",".join)
+
+thetable = pdat_agg.merge(hdat_agg, on="StudieID", how="outer") \
+                   .merge(vdat_agg, on="StudieID", how="outer") \
+                   .merge(qdat_agg, on="StudieID", how="outer")
+
 # nan for qdat vals where no entries in qdat for IDs that are present in pdat
+
+# Remove duplicates in fields
+
+for col in thetable.columns:
+    new_val = []
+    for val in thetable[col]:
+        if pd.isna(val):
+            new_val.append(val)
+        else:
+            items = str(val).split(",")
+            unique_items = sorted(set(items))
+            new_val.append(",".join(unique_items))
+    thetable[col] = new_val
 
 
 
@@ -269,6 +297,7 @@ thetable = result["pdat"].merge(result["hdat"], on="StudieID", how="outer") \
 
 # by pharma product pick up
 
+"""
 if args.pharma:
     
     grouped = pdat[pdat["StudieID"].isin(common_ids)].groupby(["StudieID","produkt"])
@@ -306,14 +335,14 @@ if args.pharma:
     pharma_summary.to_csv("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/pharma_summary_table.csv",
                     sep='\t', index=False, index_label=None, na_rep='NA')
 
-
+"""
 #------------------------------------------------------------------------------
 # Optional table transformations
 #------------------------------------------------------------------------------
 
 # sort format thetable
 
-# sort_cols = ["Age_Diagnosis", "StudieID"]
+sort_cols = ["Age_Diagnosis", "StudieID"]
 
 thetable = thetable.sort_values(by=sort_cols)
 
@@ -325,7 +354,7 @@ thetable = thetable.sort_values(by=sort_cols)
 
 thetable.to_csv("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/filtered_table.csv",
                 sep='\t', index=False, index_label=None, na_rep='NA')
-
+thetable.to_excel("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/filtered_table.xlsx", index_label=None, na_rep='NA')
 
 # just to be able to open and check in spyder
 # print(thetable.head(100))
