@@ -46,7 +46,7 @@ import warnings
 
 warnings.simplefilter("ignore", category=pd.errors.PerformanceWarning)
 
-"""
+
 # Set up argument parser
 parser = argparse.ArgumentParser(description="Specify input files and optionally: Columns to sort by and other summary tables")
 parser.add_argument("qdat")
@@ -67,8 +67,10 @@ vdat = pd.read_table(Path(args.vdat), encoding='unicode_escape', low_memory=Fals
 json_file_cats = Path(args.json_file_cats)
 json_file_conds = Path(args.json_file_conds)
 
-sort_cols = list(args.sort)
-
+if args.sort is not None:
+    sort_cols = list(args.sort)
+else:
+    sort_cols = []
 
 
 """
@@ -79,7 +81,7 @@ hdat = pd.read_table(Path("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats
 vdat = pd.read_table(Path("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/vdat_anonymised.tsv"), encoding='unicode_escape', low_memory=False)
 json_file_cats = Path("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/json_file_cats_3.json")
 json_file_conds = Path("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/json_file_conds_3.json")
-
+"""
 
 # Input file checks
 # ...
@@ -297,20 +299,20 @@ for col in thetable.columns:
 
 # by pharma product pick up
 
-"""
+
 if args.pharma:
     
-    grouped = pdat[pdat["StudieID"].isin(common_ids)].groupby(["StudieID","produkt"])
+    grouped = pdat[pdat["StudieID"].isin(common_ids)].groupby(["StudieID","subnamn"])
     
-    produkt_info_rows = []
+    substance_info_rows = []
     
     for (stu_id, prod), group in grouped:
-        dates = group["EDATUM"].tolist()   # all pickup dates for this ID+produkt
+        dates = group["EDATUM"].tolist()   # all pickup dates for this ID+substance
         count = len(dates)               # number of pickups
-        produkt_info_rows.append([stu_id, prod, count] + dates)
+        substance_info_rows.append([stu_id, prod, count] + dates)
     
-    pharma_summary = pd.DataFrame(produkt_info_rows)
-    pharma_summary.columns = ["StudieID", "produkt", "number_of_pickups"] + list(pharma_summary.columns[3:])
+    pharma_summary = pd.DataFrame(substance_info_rows)
+    pharma_summary.columns = ["StudieID", "subnamn", "number_of_pickups"] + list(pharma_summary.columns[3:])
     
     pharma_cols = pharma_summary.columns.tolist()
     for i in range(3, len(pharma_summary.columns)):
@@ -335,16 +337,17 @@ if args.pharma:
     pharma_summary.to_csv("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/pharma_summary_table.csv",
                     sep='\t', index=False, index_label=None, na_rep='NA')
 
-"""
+
 #------------------------------------------------------------------------------
 # Optional table transformations
 #------------------------------------------------------------------------------
 
 # sort format thetable
 
-sort_cols = ["Age_Diagnosis", "StudieID"]
+#sort_cols = ["Age_Diagnosis", "StudieID"]
 
-thetable = thetable.sort_values(by=sort_cols)
+if len(sort_cols) > 0:
+    thetable = thetable.sort_values(by=sort_cols)
 
 
 # thetable = thetable.drop_duplicates() # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Currently for easy look at and speed
