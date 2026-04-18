@@ -136,13 +136,6 @@ tables = {
     "hvdat": hvdat
 }
 
-cat_tables = {
-    "qdat": qdat,
-    "pdat": pdat,
-    "hdat": hdat,
-    "vdat": vdat
-}
-
 
 #------------------------------------------------------------------------------
 # Additional info coloumns generation
@@ -154,7 +147,13 @@ col_names = ["Doctoral_diagnoses_received_after_inclusion_year", "Doctoral_diagn
 
 qdat = diagnosis_vs_inclusion_time_func(func_dats, col_names)
 
-
+# cat tables dic
+cat_tables = {
+    "qdat": qdat,
+    "pdat": pdat,
+    "hdat": hdat,
+    "vdat": vdat
+}
 
 # -----------------------------------------------------------------------------
 # Filtering for user-defined conditions
@@ -183,7 +182,10 @@ result = {}
 
 for table, cols in categories.items():
     df = cat_tables[table]
-    result[table] = df[df["StudieID"].isin(common_ids)][["StudieID"] + [c for c in cols if c != "StudieID"]]
+    filtered = df[df["StudieID"].isin(common_ids)]
+    selected_cols = ["StudieID"] + [c for c in cols if c != "StudieID"]
+    result[table] = filtered[selected_cols]
+
 
 # print(result)
 # for table, df in result.items():
@@ -239,6 +241,7 @@ if args.pharma:
     pharma_summary = pharma_table_func(func_dats, common_ids)
     pharma_summary.to_csv("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/pharma_summary_table.csv",
                     sep='\t', index=False, index_label=None, na_rep='NA')
+    pharma_summary.to_excel("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/pharma_summary_table.xlsx", index_label=None, na_rep='NA')
 
 
 #------------------------------------------------------------------------------
@@ -249,6 +252,8 @@ if args.diagnosis:
     diagnosis_summary = diagnosis_table_func(func_dats, common_ids)
     diagnosis_summary.to_csv("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/diagnosis_summary_table.csv",
                     sep='\t', index=False, index_label=None, na_rep='NA')
+    diagnosis_summary.to_excel("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/diagnosis_summary_table.xlsx", index_label=None, na_rep='NA')
+
 
 
 
