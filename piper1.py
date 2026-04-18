@@ -25,7 +25,7 @@ Procedure:
 Input: 
 Output: 
 
-Usage: piper1.py ...
+Usage: python piper1.py qdat_anonymised.tsv pdat_anonymised.tsv hdat_anonymised.tsv vdat_anonymised.tsv json_file_cats_3.json json_file_conds_3.json
 
 Version: 1.00
 Date: 2026-02-28
@@ -53,7 +53,7 @@ from diagnosis_table import diagnosis_table_func
 
 warnings.simplefilter("ignore", category=pd.errors.PerformanceWarning)
 
-'''
+
 # Set up argument parser
 parser = argparse.ArgumentParser(description="Specify input files and optionally: Columns to sort by and other summary tables")
 parser.add_argument("qdat")
@@ -81,8 +81,6 @@ else:
     sort_cols = []
 
 '''
-
-
 qdat = pd.read_table(Path("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/qdat_anonymised.tsv"))
 pdat = pd.read_table(Path("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/pdat_anonymised.tsv"), encoding='unicode_escape')
 hdat = pd.read_table(Path("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/hdat_anonymised.tsv"), encoding='unicode_escape', low_memory=False)
@@ -90,7 +88,7 @@ vdat = pd.read_table(Path("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats
 json_file_cats = Path("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/json_file_cats_3.json")
 json_file_conds = Path("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/json_file_conds_3.json")
 
-
+'''
 # Input file checks
 # ...
   
