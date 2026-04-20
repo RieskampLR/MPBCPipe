@@ -127,17 +127,32 @@ func_dats = {
     "cond": cond
 }
 
-# tables dic
-tables = {
-    "qdat": qdat,
-    "pdat": pdat,
-    "hvdat": hvdat
-}
 
 
 #------------------------------------------------------------------------------
 # Additional info coloumns generation
 #------------------------------------------------------------------------------
+
+# All Diagnoses listed in 1 col (All listed diagnoses at that visit)
+
+# List of cols containing diagnosis info
+dia_cols = ["hdia"] + [f"DIA{i}" for i in range(1, 31)]
+
+# New column
+hvdat["all_diagnoses"] = (
+    hvdat[dia_cols]
+    .stack()
+    .dropna()
+    .groupby(level=0)
+    .agg(list)
+)
+
+# Remove duplicates
+hvdat["all_diagnoses"] = hvdat["all_diagnoses"].apply(set).apply(list)
+
+# Formatting
+hvdat["all_diagnoses"] = hvdat["all_diagnoses"].apply(", ".join)
+
 
 # Diagnosis time vs inclusion time
 
@@ -145,12 +160,20 @@ col_names = ["Doctoral_diagnoses_received_after_inclusion_year", "Doctoral_diagn
 
 qdat = diagnosis_vs_inclusion_time_func(func_dats, col_names)
 
+
+
 # cat tables dic
 cat_tables = {
     "qdat": qdat,
     "pdat": pdat,
-    "hdat": hdat,
-    "vdat": vdat
+    "hvdat": hvdat
+}
+
+# tables dic
+tables = {
+    "qdat": qdat,
+    "pdat": pdat,
+    "hvdat": hvdat
 }
 
 # -----------------------------------------------------------------------------
@@ -161,7 +184,7 @@ cat_tables = {
 
 # filter IDs by condition based on json file
 
-common_ids = id_selection_func(tables, cat_tables, cond)
+common_ids = id_selection_func(tables, cond)
 
 
 #print(pdat["StudieID"].isin(common_ids))
@@ -194,7 +217,7 @@ for table, cols in categories.items():
 # merge to one table for neat output
 
 # Convert all columns except StudieID to string and fill NaN
-for tbl in ["pdat", "hdat", "vdat", "qdat"]:
+for tbl in ["pdat", "hvdat", "qdat"]:
     df = result[tbl]
     for col in df.columns:
         if col != "StudieID":
@@ -203,12 +226,10 @@ for tbl in ["pdat", "hdat", "vdat", "qdat"]:
 
 # Then aggregate by StudieID
 pdat_agg = result["pdat"].groupby("StudieID", as_index=False).agg(",".join)
-hdat_agg = result["hdat"].groupby("StudieID", as_index=False).agg(",".join)
-vdat_agg = result["vdat"].groupby("StudieID", as_index=False).agg(",".join)
+hvdat_agg = result["hvdat"].groupby("StudieID", as_index=False).agg(",".join)
 qdat_agg = result["qdat"].groupby("StudieID", as_index=False).agg(",".join)
 
-thetable = pdat_agg.merge(hdat_agg, on="StudieID", how="outer") \
-                   .merge(vdat_agg, on="StudieID", how="outer") \
+thetable = pdat_agg.merge(hvdat_agg, on="StudieID", how="outer") \
                    .merge(qdat_agg, on="StudieID", how="outer")
 
 # nan for qdat vals where no entries in qdat for IDs that are present in pdat
@@ -221,7 +242,7 @@ for col in thetable.columns:
         if pd.isna(val):
             new_val.append(val)
         else:
-            items = str(val).split(",")
+            items = list(filter(None, str(val).split(","))) # filter None remove "" entries
             unique_items = sorted(set(items))
             new_val.append(",".join(unique_items))
     thetable[col] = new_val
@@ -247,7 +268,7 @@ if args.pharma:
 #------------------------------------------------------------------------------
 
 if args.diagnosis:
-    diagnosis_summary = diagnosis_table_func(func_dats, common_ids)
+    diagnosis_summary = diagnosis_table_func(func_dats, common_ids, dia_cols)
     diagnosis_summary.to_csv("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/diagnosis_summary_table.csv",
                     sep='\t', index=False, index_label=None, na_rep='NA')
     diagnosis_summary.to_excel("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/diagnosis_summary_table.xlsx", index_label=None, na_rep='NA')

@@ -10,7 +10,7 @@
   "Hoehn_Yahr",
   "Doctoral_diagnoses_received_after_inclusion_year"
   ],
-  "hdat":
-  ["hdia"],
-  "vdat": []
+  "hvdat":
+  ["hdia",
+  "all_diagnoses"]
 }

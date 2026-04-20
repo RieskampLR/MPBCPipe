@@ -6,7 +6,7 @@ Func to filter IDs by condition based on json file
 """
 
 
-def id_selection_func(tables, cat_tables, cond):
+def id_selection_func(tables, cond):
     
     id_selection = {}
 

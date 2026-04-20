@@ -9,11 +9,8 @@ import pandas as pd
 import numpy as np
 
 
-def diagnosis_table_func(func_dats, common_ids):
+def diagnosis_table_func(func_dats, common_ids, dia_cols):
     hvdat = func_dats["hvdat"]
-    
-    # list of cols containing diagnosis info
-    dia_cols = ["hdia"] + [f"DIA{i}" for i in range(1, 31)]
     
     
     id_to_dias = hvdat.melt(id_vars=["StudieID", "INDATUM"],        # sets identifier var

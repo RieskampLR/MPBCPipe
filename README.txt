@@ -34,12 +34,12 @@ openpyxl
 
 Json file formats and modifications:
 Categories:
-The json file for output table category specifications must contain a dictionary with "pdat", "qdat", "hdat", and "vdat" as keys,
-representing pharmacy, questionnaire, hospital, and doctoral visits respectively,
+The json file for output table category specifications must contain a dictionary with "pdat", "qdat", and "hvdat" as keys,
+representing pharmacy, questionnaire, and hospital+doctoral visits data,
 and lists containing the requested categories from within the corresponding data sets as values
 Conditions:
 The json file specifying the conditions under which samples are included in the output table must also contain a dictionary.
-Here the keys are "qdat", "pdat", and "hvdat", representing questionnaire, pharmacy, and hospital+doctoral visits data.
+Here the keys are the same as in the categories file.
 The values in this case are again dictionaries. These contain the category that a condition is applied to as key and a further dictionary as a value.
 The further dictionaries contain 1. "type" as a key followed by a string as a value
 and 2. "value" as key and a list stating the condition as a value.
