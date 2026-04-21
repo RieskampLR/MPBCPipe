@@ -10,7 +10,7 @@ import pandas as pd
 import numpy as np
 
 
-def diagnosis_vs_inclusion_time_func(func_dats, col_names):
+def diagnosis_vs_inclusion_time_func(func_dats):
     # Assign data and variables from main script
     qdat = func_dats["qdat"]
     hvdat = func_dats["hvdat"]
@@ -18,6 +18,8 @@ def diagnosis_vs_inclusion_time_func(func_dats, col_names):
     vdat = func_dats["vdat"]
     categories = func_dats["categories"]
     cond = func_dats["cond"]
+    
+    col_names = ["Doctoral_diagnoses_received_after_inclusion_year", "Doctoral_diagnoses_at_inclusion_+-1year", "Doctoral_diagnoses_recorded_till_inclusion_+1year"]
 
     if any(col in categories["qdat"] or col in cond["qdat"] for col in col_names):
 
@@ -79,10 +81,5 @@ def diagnosis_vs_inclusion_time_func(func_dats, col_names):
         
         return qdat
         
-        #diff_entries = qdat[qdat.iloc[:, 5] != qdat.iloc[:, 6]]
-        
-        # Controls that received a diagnosis starting with G
-        # ids = qdat.loc[(qdat["Control"] == 1) & qdat.iloc[:, 5:8].astype(str).stack().str.contains(r"\bG", na=False).groupby(level=0).any(), "StudieID"]
-        # sub_qdat = qdat[qdat["StudieID"].isin(ids)]
 
 

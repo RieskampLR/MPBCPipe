@@ -6,12 +6,16 @@
 piper1.py
 
 Description:
+    dias before/at/after inclusion year in qdat currently refer to hdia!
+    For details on any diagnosis refer to the additionally generated diagnosis table
 
 Additional info/columns provided:
     qdat:
         Doctoral_diagnoses_at_inclusion_+-1year
         Doctoral_diagnoses_recorded_till_inclusion_+1year
         Doctoral_diagnoses_received_after_inclusion_year
+    hvdat:
+        all_diagnoses
 
 Hard-code conditions:
 - Header entries / short codes have to be named the same in any new data collection files
@@ -20,6 +24,7 @@ User-defined functions: None
 Non-standard modules: None
 
 Procedure:
+    !Files have to be converted to tsv using the provided script csv_to_tsv to be applicable to this pipeline!
 
     
 Input: 
@@ -43,10 +48,12 @@ import pandas as pd
 import numpy as np
 import warnings
 
+from all_dias_col import  all_diagnoses_func
 from dia_vs_incl import diagnosis_vs_inclusion_time_func
 from id_selec import id_selection_func
 from pharma_table import pharma_table_func
 from diagnosis_table import diagnosis_table_func
+from thetable import thetable_func
 
 
 # Storing Paths of arguments in variables:
@@ -101,8 +108,6 @@ hvdat = pd.concat([hdat, vdat], ignore_index=True, join="outer")
 hvdat["UTDATUMA"] = hvdat["UTDATUMA"].astype("Int64")
 
 
-# qdat.insert(4, "Inclusion_Year", qdat.pop("Inclusion_Year"))
-
 
 # Get json file contents
 
@@ -115,7 +120,7 @@ with open(json_file_conds) as json_file:
 
 
 
-# Variable and data dics for functions
+# Variable and data dics for functions and other
 
 func_dats = {
     "qdat": qdat,
@@ -127,6 +132,8 @@ func_dats = {
     "cond": cond
 }
 
+# List of cols containing diagnosis info
+dia_cols = ["hdia"] + [f"DIA{i}" for i in range(1, 31)]
 
 
 #------------------------------------------------------------------------------
@@ -135,32 +142,15 @@ func_dats = {
 
 # All Diagnoses listed in 1 col (All listed diagnoses at that visit)
 
-# List of cols containing diagnosis info
-dia_cols = ["hdia"] + [f"DIA{i}" for i in range(1, 31)]
-
-# New column
-hvdat["all_diagnoses"] = (
-    hvdat[dia_cols]
-    .stack()
-    .dropna()
-    .groupby(level=0)
-    .agg(list)
-)
-
-# Remove duplicates
-hvdat["all_diagnoses"] = hvdat["all_diagnoses"].apply(set).apply(list)
-
-# Formatting
-hvdat["all_diagnoses"] = hvdat["all_diagnoses"].apply(", ".join)
+hvdat = all_diagnoses_func(func_dats, dia_cols)
 
 
 # Diagnosis time vs inclusion time
 
-col_names = ["Doctoral_diagnoses_received_after_inclusion_year", "Doctoral_diagnoses_at_inclusion_+-1year", "Doctoral_diagnoses_recorded_till_inclusion_+1year"]
-
-qdat = diagnosis_vs_inclusion_time_func(func_dats, col_names)
+qdat = diagnosis_vs_inclusion_time_func(func_dats)
 
 
+# More variable and data dics for functions and other
 
 # cat tables dic
 cat_tables = {
@@ -181,72 +171,33 @@ tables = {
 #------------------------------------------------------------------------------
 
 
-
 # filter IDs by condition based on json file
 
 common_ids = id_selection_func(tables, cond)
-
-
-#print(pdat["StudieID"].isin(common_ids))
-#print(pdat.loc[pdat["StudieID"].isin(common_ids), "StudieID"])
 
 
 # -----------------------------------------------------------------------------
 # Output table generation and formatting
 #------------------------------------------------------------------------------
 
-# Filtering for user-defined output table categories
-
-# collect info on chosen IDs from other tables
-
-result = {}
-
-for table, cols in categories.items():
-    df = cat_tables[table]
-    filtered = df[df["StudieID"].isin(common_ids)]
-    selected_cols = ["StudieID"] + [c for c in cols if c != "StudieID"]
-    result[table] = filtered[selected_cols]
+thetable = thetable_func(func_dats, cat_tables, common_ids)
 
 
-# print(result)
-# for table, df in result.items():
-  #   print(table, len(df["StudieID"].unique()))
+#------------------------------------------------------------------------------
+# Optional table transformations
+#------------------------------------------------------------------------------
+
+# sort format thetable
+
+#sort_cols = ["Age_Diagnosis", "StudieID"] # Spyder version
+
+if len(sort_cols) > 0:
+    thetable = thetable.sort_values(by=sort_cols)
 
 
-
-# merge to one table for neat output
-
-# Convert all columns except StudieID to string and fill NaN
-for tbl in ["pdat", "hvdat", "qdat"]:
-    df = result[tbl]
-    for col in df.columns:
-        if col != "StudieID":
-            df[col] = df[col].fillna("").astype(str)
-    result[tbl] = df
-
-# Then aggregate by StudieID
-pdat_agg = result["pdat"].groupby("StudieID", as_index=False).agg(",".join)
-hvdat_agg = result["hvdat"].groupby("StudieID", as_index=False).agg(",".join)
-qdat_agg = result["qdat"].groupby("StudieID", as_index=False).agg(",".join)
-
-thetable = pdat_agg.merge(hvdat_agg, on="StudieID", how="outer") \
-                   .merge(qdat_agg, on="StudieID", how="outer")
-
-# nan for qdat vals where no entries in qdat for IDs that are present in pdat
-
-# Remove duplicates in fields
-
-for col in thetable.columns:
-    new_val = []
-    for val in thetable[col]:
-        if pd.isna(val):
-            new_val.append(val)
-        else:
-            items = list(filter(None, str(val).split(","))) # filter None remove "" entries
-            unique_items = sorted(set(items))
-            new_val.append(",".join(unique_items))
-    thetable[col] = new_val
-
+thetable.to_csv("filtered_table.csv",
+                sep='\t', index=False, index_label=None, na_rep='NA')
+thetable.to_excel("filtered_table.xlsx", index_label=None, na_rep='NA')
 
 
 #------------------------------------------------------------------------------
@@ -258,9 +209,9 @@ for col in thetable.columns:
 
 if args.pharma:
     pharma_summary = pharma_table_func(func_dats, common_ids)
-    pharma_summary.to_csv("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/pharma_summary_table.csv",
+    pharma_summary.to_csv("pharma_summary_table.csv",
                     sep='\t', index=False, index_label=None, na_rep='NA')
-    pharma_summary.to_excel("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/pharma_summary_table.xlsx", index_label=None, na_rep='NA')
+    pharma_summary.to_excel("pharma_summary_table.xlsx", index_label=None, na_rep='NA')
 
 
 #------------------------------------------------------------------------------
@@ -269,36 +220,10 @@ if args.pharma:
 
 if args.diagnosis:
     diagnosis_summary = diagnosis_table_func(func_dats, common_ids, dia_cols)
-    diagnosis_summary.to_csv("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/diagnosis_summary_table.csv",
+    diagnosis_summary.to_csv("diagnosis_summary_table.csv",
                     sep='\t', index=False, index_label=None, na_rep='NA')
-    diagnosis_summary.to_excel("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/diagnosis_summary_table.xlsx", index_label=None, na_rep='NA')
+    diagnosis_summary.to_excel("diagnosis_summary_table.xlsx", index_label=None, na_rep='NA')
 
-
-
-
-#------------------------------------------------------------------------------
-# Optional table transformations
-#------------------------------------------------------------------------------
-
-# sort format thetable
-
-#sort_cols = ["Age_Diagnosis", "StudieID"]
-
-if len(sort_cols) > 0:
-    thetable = thetable.sort_values(by=sort_cols)
-
-
-# thetable = thetable.drop_duplicates() # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Currently for easy look at and speed
-
-
-#print(thetable)
-
-thetable.to_csv("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/filtered_table.csv",
-                sep='\t', index=False, index_label=None, na_rep='NA')
-thetable.to_excel("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/filtered_table.xlsx", index_label=None, na_rep='NA')
-
-# just to be able to open and check in spyder:
-# print(thetable.head(100))
 
 
 

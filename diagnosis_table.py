@@ -11,6 +11,7 @@ import numpy as np
 
 def diagnosis_table_func(func_dats, common_ids, dia_cols):
     hvdat = func_dats["hvdat"]
+    qdat = func_dats["qdat"]
     
     
     id_to_dias = hvdat.melt(id_vars=["StudieID", "INDATUM"],        # sets identifier var
@@ -36,7 +37,7 @@ def diagnosis_table_func(func_dats, common_ids, dia_cols):
     # To table format
     diagnosis_summary = pd.DataFrame(dias_info_rows)
     # Col headers
-    diagnosis_summary.columns = ["StudieID", "diagnosis", "number_of_pickups"] + list(diagnosis_summary.columns[3:])
+    diagnosis_summary.columns = ["StudieID", "diagnosis", "number_of_times_diagnosed"] + list(diagnosis_summary.columns[3:])
     
     # Time frame column
     # Get date col names
@@ -57,6 +58,14 @@ def diagnosis_table_func(func_dats, common_ids, dia_cols):
     diagnosis_summary["span"] = diagnosis_summary["min_date"] + " - " + diagnosis_summary["max_date"]
     diagnosis_summary = diagnosis_summary.drop(columns=["min_date", "max_date"])
     
+    # Add Inclusion_Year col
+    qdat_cut = qdat[["StudieID", "Inclusion_Year"]].drop_duplicates()
+    diagnosis_summary = diagnosis_summary.merge(qdat_cut, on="StudieID", how="left")
+    
+    # Move Inclusion_Year to 2nd column
+    cols = diagnosis_summary.columns.tolist()
+    cols.insert(1, cols.pop(cols.index("Inclusion_Year")))
+    diagnosis_summary = diagnosis_summary[cols] # Copy table to new col order
     
     return diagnosis_summary
 
