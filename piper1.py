@@ -120,6 +120,14 @@ with open(json_file_conds) as json_file:
 
 
 
+
+# List of cols containing diagnosis info
+dia_cols = ["hdia"] + [f"DIA{i}" for i in range(1, 31)]
+
+# Turning all Dia entries to simple strings cause the entry formats ARE A MESS
+hvdat[dia_cols] = hvdat[dia_cols].apply(lambda col: col.map(str))
+
+
 # Variable and data dics for functions and other
 
 func_dats = {
@@ -132,10 +140,6 @@ func_dats = {
     "cond": cond
 }
 
-# List of cols containing diagnosis info
-dia_cols = ["hdia"] + [f"DIA{i}" for i in range(1, 31)]
-
-
 #------------------------------------------------------------------------------
 # Additional info coloumns generation
 #------------------------------------------------------------------------------
@@ -143,11 +147,19 @@ dia_cols = ["hdia"] + [f"DIA{i}" for i in range(1, 31)]
 # All Diagnoses listed in 1 col (All listed diagnoses at that visit)
 
 hvdat = all_diagnoses_func(func_dats, dia_cols)
+hvdat[dia_cols] = hvdat[dia_cols].replace("nan", np.nan)
+
+
+# Update func dats entry
+func_dats["hvdat"] = hvdat
 
 
 # Diagnosis time vs inclusion time
 
 qdat = diagnosis_vs_inclusion_time_func(func_dats)
+
+# Update func dats entry
+func_dats["qdat"] = qdat
 
 
 # More variable and data dics for functions and other
@@ -175,6 +187,8 @@ tables = {
 
 common_ids = id_selection_func(tables, cond)
 
+df_hdia = hvdat.loc[hvdat["StudieID"].isin(common_ids), ["StudieID", "hdia"]]
+#print(df_hdia)
 
 # -----------------------------------------------------------------------------
 # Output table generation and formatting

@@ -10,19 +10,14 @@ import pandas as pd
 def all_diagnoses_func(func_dats, dia_cols):
     hvdat = func_dats["hvdat"]
 
-    # New column
-    hvdat["all_diagnoses"] = (
-        hvdat[dia_cols]
-        .stack()
-        .dropna()
-        .groupby(level=0)
-        .agg(list)
-    )
+    hvdat["all_diagnoses"] = hvdat[dia_cols].values.tolist()
+    hvdat["all_diagnoses"] = hvdat["all_diagnoses"].apply(set)
+    hvdat["all_diagnoses"] = hvdat["all_diagnoses"].apply(list)
     
-    # Remove duplicates
-    hvdat["all_diagnoses"] = hvdat["all_diagnoses"].apply(set).apply(list)
+    # Remove nan entries
+    hvdat["all_diagnoses"] = hvdat["all_diagnoses"].apply(lambda x: [i for i in x if i != "nan" and pd.notna(i)])
     
-    # Formatting
-    hvdat["all_diagnoses"] = hvdat["all_diagnoses"].apply(", ".join)
-    
+    #for row in hvdat["all_diagnoses"].values:
+     #   print(row)
+
     return hvdat

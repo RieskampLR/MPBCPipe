@@ -2,6 +2,7 @@
 """
 
 Func for column generation of diagnosis times in comparison to inclusion time in qdat
+Diagnoses listed are from hdia AND any other DIA cols
 
 """
 
@@ -73,13 +74,12 @@ def diagnosis_vs_inclusion_time_func(func_dats):
             
             # Add to qdat table
             qdat = qdat.merge(result, on="StudieID", how="left")
-            #qdat = pd.concat([qdat.iloc[:, :5], result.drop(columns="StudieID"), qdat.iloc[:, 5:]], axis=1) # move column to 6th position
             qdat.insert(5 + counter - 1, col_name, qdat.pop(col_name))
         
         
-        qdat = qdat.copy() # removes saved memory of column movement
+    qdat = qdat.copy() # removes saved memory of column movement
         
-        return qdat
+    return qdat
         
 
 

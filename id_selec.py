@@ -14,28 +14,42 @@ def id_selection_func(tables, cond):
         filters = cond[table]
         ids = tables[table]
         for col, val in filters.items():
-            if val["type"] == "range":
-                if val["values"][0] == ">=":
-                    ids = ids[ids[col] >= val["values"][1]]
-                elif val["values"][0] == "<=":
-                    ids = ids[ids[col] <= val["values"][1]]
-                else:
-                    ids = ids[ids[col].between(*val["values"])]
-            elif val["type"] == "string":
-                if val["values"] == ["any"]:
-                    ids = ids[ids[col].notna()]
-                else:
-                    ids = ids[ids[col].astype(str).isin(val["values"])]
-            else:
-                ids = ids[ids[col].isin(val["values"])]
-        id_selection[table] = ids["StudieID"]
+            if col == "all_diagnoses":
+                ####################################################################################
+                for x in ids["all_diagnoses"]:
+                    print(x)
+                    if any(v in x for v in val):
+                        print("match", x, val)
 
-    # print(id_selection)
+                print(len(ids["all_diagnoses"]))
+                #######################################################################################
+            else:
+                if val["type"] == "range":
+                    if val["values"][0] == ">=":
+                        ids = ids[ids[col] >= val["values"][1]]
+                    elif val["values"][0] == "<=":
+                        ids = ids[ids[col] <= val["values"][1]]
+                    else:
+                        ids = ids[ids[col].between(*val["values"])]
+                elif val["type"] == "string":
+                    if val["values"] == ["any"]:
+                        ids = ids[ids[col].notna()]
+                    elif val["values"] == ["none"]:
+                        ids = ids[ids[col].isna()]
+                        #print(len(ids["hdia"].iloc[30:60]))
+                    else:
+                        ids = ids[ids[col].astype(str).isin(val["values"])]
+                else:
+                    ids = ids[ids[col].isin(val["values"])]
+        id_selection[table] = ids["StudieID"]
+        #for k, v in id_selection.items():
+         #   print(k, len(v))
+
 
     # IDs must match ALL conditions
 
-    common_ids = set.intersection(*(set(ids) for ids in id_selection.values()))
-    # print(common_ids)
+    common_ids = set.intersection(*(set(v) for v in id_selection.values()))
+    #print(len(common_ids))
     
     return common_ids
 

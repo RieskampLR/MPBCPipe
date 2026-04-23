@@ -28,6 +28,9 @@ Example files are available and can be easily modified.
 
 Installations:
 python
+	pandas
+	numpy
+	...
 openpyxl
 ...
 
