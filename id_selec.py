@@ -15,14 +15,12 @@ def id_selection_func(tables, cond):
         ids = tables[table]
         for col, val in filters.items():
             if col == "all_diagnoses":
-                ####################################################################################
-                for x in ids["all_diagnoses"]:
-                    print(x)
-                    if any(v in x for v in val):
-                        print("match", x, val)
-
-                print(len(ids["all_diagnoses"]))
-                #######################################################################################
+                for x in ids[col]:
+                    overlap = [i for i in x if i in val["values"]]
+                    if overlap:
+                        print(overlap)
+                        ids = ids[ids[col].apply(lambda lst: any(i in val["values"] for i in lst))]   
+                print(len(ids[col]))
             else:
                 if val["type"] == "range":
                     if val["values"][0] == ">=":
