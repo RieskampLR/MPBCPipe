@@ -71,7 +71,7 @@ parser.add_argument("json_file_cats")
 parser.add_argument("json_file_conds")
 parser.add_argument("-s", "--sort", type=str, nargs="+", help="Column to sort by")
 parser.add_argument("-p", "--pharma", action="store_true", help="Pharma pick ups summary")
-parser.add_argument("-d", "--diagnosis", action="store_true", help="Diagnosis cases summary")
+parser.add_argument("-d", "--diagnosis", nargs="*", default=None, help="Diagnosis cases summary")
 args = parser.parse_args()
 
 qdat = pd.read_csv(Path(args.qdat), sep="\t")
@@ -231,10 +231,18 @@ if args.pharma:
 # Diagnosis table generation
 #------------------------------------------------------------------------------
 
-if args.diagnosis:
-    diagnosis_summary = diagnosis_table_func(func_dats, common_ids, dia_cols)
+if args.diagnosis != None:
+    if args.diagnosis != True:
+        if isinstance(args.diagnosis, str):
+            qdat_dias = [args.diagnosis]
+        else:
+            qdat_dias = args.diagnosis
+    else:
+        qdat_dias = None
+
+    diagnosis_summary = diagnosis_table_func(func_dats, common_ids, dia_cols, qdat_dias)
     diagnosis_summary.to_csv("diagnosis_summary_table.tsv",
-                    sep='\t', index=False, index_label=None, na_rep='NA')
+                sep='\t', index=False, index_label=None, na_rep='NA')
     diagnosis_summary.to_excel("diagnosis_summary_table.xlsx", index=False, na_rep='NA')
 
 

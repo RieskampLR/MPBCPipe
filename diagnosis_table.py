@@ -9,7 +9,7 @@ import pandas as pd
 import numpy as np
 
 
-def diagnosis_table_func(func_dats, common_ids, dia_cols):
+def diagnosis_table_func(func_dats, common_ids, dia_cols, qdat_dias):
     hvdat = func_dats["hvdat"]
     qdat = func_dats["qdat"]
     
@@ -64,26 +64,33 @@ def diagnosis_table_func(func_dats, common_ids, dia_cols):
     
 
     # Phenoconv cols
-    # PhenoG20 (from qdat)
-    diagnosis_summary = diagnosis_summary.merge(qdat[["StudieID", "PHENO"]], on='StudieID', how='left').rename(columns={'PHENO': 'PhenoG20'})
+    # Pheno_G20 (from qdat)
+    diagnosis_summary = diagnosis_summary.merge(qdat[["StudieID", "PHENO"]], on='StudieID', how='left').rename(columns={'PHENO': 'Pheno_G20'})
     
     # Conversion
     half_condition = diagnosis_summary["diagnosis"].str.contains("G20", na=False)
     diagnosis_summary["G20_Conversion"] = np.where( # returns one val where a condition is true, another where it is false
-        diagnosis_summary["PhenoG20"].isna(),       # condition: Is NA val
+        diagnosis_summary["Pheno_G20"].isna(),       # condition: Is NA val
         np.nan,                                     # val if false: nan
-        (diagnosis_summary["PhenoG20"] != 1) & half_condition | # val if true: boolean, 1 or 0
-        (diagnosis_summary["PhenoG20"] != 1) & ~half_condition
+        (diagnosis_summary["Pheno_G20"] != 1) & half_condition | # val if true: boolean, 1 or 0
+        (diagnosis_summary["Pheno_G20"] != 1) & ~half_condition
     ).astype(int)
 
+
+    # Pheno-user-defined (from qdat)
+    if qdat_dias != None:
+        diagnosis_summary = diagnosis_summary.merge(qdat[["StudieID"] + qdat_dias], on="StudieID", how="left").rename(columns={c: f"Pheno_{c}" for c in qdat_dias})
     
 
-    
+
     # Move cols
     cols = diagnosis_summary.columns.tolist()
     cols.insert(1, cols.pop(cols.index("Inclusion_Year")))
-    cols.insert(3, cols.pop(cols.index("PhenoG20")))
+    cols.insert(3, cols.pop(cols.index("Pheno_G20")))
     cols.insert(4, cols.pop(cols.index("G20_Conversion")))
+    if qdat_dias != None:
+        for i, c in enumerate([f"Pheno_{dia}" for dia in qdat_dias]):
+            cols.insert(5 + i, cols.pop(cols.index(c)))
     diagnosis_summary = diagnosis_summary[cols]
 
 
