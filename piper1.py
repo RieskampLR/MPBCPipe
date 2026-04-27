@@ -209,9 +209,9 @@ if len(sort_cols) > 0:
     thetable = thetable.sort_values(by=sort_cols)
 
 
-thetable.to_csv("filtered_table.csv",
+thetable.to_csv("filtered_table.tsv",
                 sep='\t', index=False, index_label=None, na_rep='NA')
-thetable.to_excel("filtered_table.xlsx", index_label=None, na_rep='NA')
+thetable.to_excel("filtered_table.xlsx", index=False, na_rep='NA')
 
 
 #------------------------------------------------------------------------------
@@ -220,12 +220,11 @@ thetable.to_excel("filtered_table.xlsx", index_label=None, na_rep='NA')
 
 # by pharma product pick up
 
-
 if args.pharma:
     pharma_summary = pharma_table_func(func_dats, common_ids)
-    pharma_summary.to_csv("pharma_summary_table.csv",
+    pharma_summary.to_csv("pharma_summary_table.tsv",
                     sep='\t', index=False, index_label=None, na_rep='NA')
-    pharma_summary.to_excel("pharma_summary_table.xlsx", index_label=None, na_rep='NA')
+    pharma_summary.to_excel("pharma_summary_table.xlsx", index=False, na_rep='NA')
 
 
 #------------------------------------------------------------------------------
@@ -234,9 +233,9 @@ if args.pharma:
 
 if args.diagnosis:
     diagnosis_summary = diagnosis_table_func(func_dats, common_ids, dia_cols)
-    diagnosis_summary.to_csv("diagnosis_summary_table.csv",
+    diagnosis_summary.to_csv("diagnosis_summary_table.tsv",
                     sep='\t', index=False, index_label=None, na_rep='NA')
-    diagnosis_summary.to_excel("diagnosis_summary_table.xlsx", index_label=None, na_rep='NA')
+    diagnosis_summary.to_excel("diagnosis_summary_table.xlsx", index=False, na_rep='NA')
 
 
 

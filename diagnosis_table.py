@@ -62,10 +62,31 @@ def diagnosis_table_func(func_dats, common_ids, dia_cols):
     qdat_cut = qdat[["StudieID", "Inclusion_Year"]].drop_duplicates()
     diagnosis_summary = diagnosis_summary.merge(qdat_cut, on="StudieID", how="left")
     
-    # Move Inclusion_Year to 2nd column
+
+    # Phenoconv cols
+    # PhenoG20 (from qdat)
+    diagnosis_summary = diagnosis_summary.merge(qdat[["StudieID", "PHENO"]], on='StudieID', how='left').rename(columns={'PHENO': 'PhenoG20'})
+    
+    # Conversion
+    half_condition = diagnosis_summary["diagnosis"].str.contains("G20", na=False)
+    diagnosis_summary["G20_Conversion"] = np.where( # returns one val where a condition is true, another where it is false
+        diagnosis_summary["PhenoG20"].isna(),       # condition: Is NA val
+        np.nan,                                     # val if false: nan
+        (diagnosis_summary["PhenoG20"] != 1) & half_condition | # val if true: boolean, 1 or 0
+        (diagnosis_summary["PhenoG20"] != 1) & ~half_condition
+    ).astype(int)
+
+    
+
+    
+    # Move cols
     cols = diagnosis_summary.columns.tolist()
     cols.insert(1, cols.pop(cols.index("Inclusion_Year")))
-    diagnosis_summary = diagnosis_summary[cols] # Copy table to new col order
+    cols.insert(3, cols.pop(cols.index("PhenoG20")))
+    cols.insert(4, cols.pop(cols.index("G20_Conversion")))
+    diagnosis_summary = diagnosis_summary[cols]
+
+
     
     return diagnosis_summary
 
