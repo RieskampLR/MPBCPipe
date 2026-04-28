@@ -30,7 +30,7 @@ Procedure:
 Input: 
 Output: 
 
-Usage: python piper1.py qdat_anonymised.tsv pdat_anonymised.tsv hdat_anonymised.tsv vdat_anonymised.tsv json_file_cats_3.json json_file_conds_3.json
+Usage: python piper1.py -q qdat_anonymised.tsv -p pdat_anonymised.tsv -hd hdat_anonymised.tsv -v vdat_anonymised.tsv -cat cats_4.json -cond conds_4.json
 
 Version: 1.00
 Date: 2026-02-28
@@ -63,23 +63,24 @@ warnings.simplefilter("ignore", category=pd.errors.PerformanceWarning)
 
 # Set up argument parser
 parser = argparse.ArgumentParser(description="Specify input files and optionally: Columns to sort by and other summary tables")
-parser.add_argument("qdat")
-parser.add_argument("pdat")
-parser.add_argument("hdat")
-parser.add_argument("vdat")
-parser.add_argument("json_file_cats")
-parser.add_argument("json_file_conds")
+parser.add_argument("-q", "--qdat")
+parser.add_argument("-p", "--pdat")
+parser.add_argument("-hd", "--hdat") # -h is reserved by argparse for help
+parser.add_argument("-v", "--vdat")
+parser.add_argument("-cat", "--categories", required=True)
+parser.add_argument("-cond", "--conditions", required=True)
 parser.add_argument("-s", "--sort", type=str, nargs="+", help="Column to sort by")
-parser.add_argument("-p", "--pharma", action="store_true", help="Pharma pick ups summary")
-parser.add_argument("-d", "--diagnosis", nargs="*", default=None, help="Diagnosis cases summary")
+parser.add_argument("-pt", "--pharma", action="store_true", help="Pharma pick ups summary table")
+parser.add_argument("-dt", "--diagnosis", nargs="*", default=None, help="Diagnosis cases summary table")
 args = parser.parse_args()
 
-qdat = pd.read_csv(Path(args.qdat), sep="\t")
-pdat = pd.read_table(Path(args.pdat), encoding='unicode_escape')
-hdat = pd.read_table(Path(args.hdat), encoding='unicode_escape', low_memory=False)
-vdat = pd.read_table(Path(args.vdat), encoding='unicode_escape', low_memory=False)
-json_file_cats = Path(args.json_file_cats)
-json_file_conds = Path(args.json_file_conds)
+
+qdat = pd.read_csv(Path(args.qdat), sep="\t") if args.qdat else None
+pdat = pd.read_table(Path(args.pdat), encoding='unicode_escape') if args.pdat else None
+hdat = pd.read_table(Path(args.hdat), encoding='unicode_escape', low_memory=False) if args.hdat else None
+vdat = pd.read_table(Path(args.vdat), encoding='unicode_escape', low_memory=False) if args.vdat else None
+cats_file = Path(args.categories)
+conds_file = Path(args.conditions)
 
 
 if args.sort is not None:
@@ -92,8 +93,8 @@ qdat = pd.read_table(Path("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats
 pdat = pd.read_table(Path("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/pdat_anonymised.tsv"), encoding='unicode_escape')
 hdat = pd.read_table(Path("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/hdat_anonymised.tsv"), encoding='unicode_escape', low_memory=False)
 vdat = pd.read_table(Path("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/vdat_anonymised.tsv"), encoding='unicode_escape', low_memory=False)
-json_file_cats = Path("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/json_file_cats_3.json")
-json_file_conds = Path("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/json_file_conds_3.json")
+cats_file = Path("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/cats_4.json")
+conds_file = Path("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/conds_4.json")
 
 '''
 # Input file checks
@@ -104,18 +105,23 @@ json_file_conds = Path("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/js
 
 qdat = qdat.rename(columns={"Id": "StudieID"})
 
-hvdat = pd.concat([hdat, vdat], ignore_index=True, join="outer")
-hvdat["UTDATUMA"] = hvdat["UTDATUMA"].astype("Int64")
+if hdat is not None or vdat is not None:
+    hvdat = pd.concat([hdat, vdat], ignore_index=True, join="outer") # hdat or vdat automatically ignored when one of them is None
+    if hdat is not None:
+        hvdat["UTDATUMA"] = hvdat["UTDATUMA"].astype("Int64")
+else:
+    hvdat = None
+
 
 
 
 # Get json file contents
 
 # chosen cats/headers
-with open(json_file_cats, "r") as json_file:
-    categories = json.load(json_file)
+with open(cats_file, "r") as json_file:
+    cat = json.load(json_file)
 # chosen conditions
-with open(json_file_conds) as json_file:
+with open(conds_file) as json_file:
     cond = json.load(json_file)
 
 
@@ -125,7 +131,8 @@ with open(json_file_conds) as json_file:
 dia_cols = ["hdia"] + [f"DIA{i}" for i in range(1, 31)]
 
 # Turning all Dia entries to simple strings cause the entry formats ARE A MESS
-hvdat[dia_cols] = hvdat[dia_cols].apply(lambda col: col.map(str))
+if hvdat is not None:
+    hvdat[dia_cols] = hvdat[dia_cols].apply(lambda col: col.map(str))
 
 
 # Variable and data dics for functions and other
@@ -136,59 +143,54 @@ func_dats = {
     "hdat": hdat,
     "vdat": vdat,
     "pdat": pdat,
-    "categories": categories,
+    "categories": cat,
     "cond": cond
 }
+
 
 #------------------------------------------------------------------------------
 # Additional info coloumns generation
 #------------------------------------------------------------------------------
 
-# All Diagnoses listed in 1 col (All listed diagnoses at that visit)
 
-hvdat = all_diagnoses_func(func_dats, dia_cols)
-hvdat[dia_cols] = hvdat[dia_cols].replace("nan", np.nan)
+if hvdat is not None:
+    # All Diagnoses listed in 1 col (All listed diagnoses at that visit)
+    hvdat = all_diagnoses_func(func_dats, dia_cols)
+    hvdat[dia_cols] = hvdat[dia_cols].replace("nan", np.nan)
+    # Update func dats entry
+    func_dats["hvdat"] = hvdat
 
-
-# Update func dats entry
-func_dats["hvdat"] = hvdat
-
-
-# Diagnosis time vs inclusion time
-
-qdat = diagnosis_vs_inclusion_time_func(func_dats)
-
-# Update func dats entry
-func_dats["qdat"] = qdat
+    # Diagnosis time vs inclusion time
+    qdat = diagnosis_vs_inclusion_time_func(func_dats)
+    # Update func dats entry
+    func_dats["qdat"] = qdat
 
 
 # More variable and data dics for functions and other
 
 # cat tables dic
-cat_tables = {
+cat_tables = {key: val for key, val in {
     "qdat": qdat,
     "pdat": pdat,
     "hvdat": hvdat
-}
+}.items() if val is not None}
 
 # tables dic
-tables = {
+tables = {key: val for key, val in {
     "qdat": qdat,
     "pdat": pdat,
     "hvdat": hvdat
-}
+}.items() if val is not None}
+
 
 # -----------------------------------------------------------------------------
 # Filtering for user-defined conditions
 #------------------------------------------------------------------------------
 
-
 # filter IDs by condition based on json file
 
 common_ids = id_selection_func(tables, cond)
 
-df_hdia = hvdat.loc[hvdat["StudieID"].isin(common_ids), ["StudieID", "hdia"]]
-#print(df_hdia)
 
 # -----------------------------------------------------------------------------
 # Output table generation and formatting

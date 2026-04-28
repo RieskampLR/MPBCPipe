@@ -8,8 +8,8 @@ UT_R_PAR_SV_14691_2021,
 and QuestionnaireData_N1864_FINAL_CLEANED_210621
 
 Command to run the pipeline:
-python piper1.py QuestionnaireData_N1864_FINAL_CLEANED_210621 UT_R_LMED_14691_2021 UT_R_PAR_SV_14691_2021 UT_R_PAR_OV_14691_2021 categories.json conditions.json
-Optional: -s example example -p
+python piper1.py -q QuestionnaireData_N1864_FINAL_CLEANED_210621 -p UT_R_LMED_14691_2021 -hd UT_R_PAR_SV_14691_2021 -v UT_R_PAR_OV_14691_2021 -cat categories.json -cond conditions.json
+Optional: -s example example -pt -dt example example
 
 Flags:
 -s: The user can add this flag to specify the categories by which the output table should be sorted by.
@@ -49,13 +49,19 @@ and 2. "value" as key and a list stating the condition as a value.
 Depending on this condition's format in the list the string for the "type" key is either "values", "range", or "string".
 The conditions lists also allow for ">=" and "<=" in ranges and "any" as strings (stating to exclude empty / NA entries).
 
+If qdat, pdat, or hdat and vdat are not provided the json entries for these are to be removed from the categories and conditions files.
+
+
 
 The script calculates additional categories from combining data across the sets. These categories can be included in the json files and currently include:
 qdat:
-Doctoral_diagnoses_at_inclusion_+-1year
-Doctoral_diagnoses_recorded_till_inclusion_+1year
-Doctoral_diagnoses_received_after_inclusion_year
-
+When hdat and/or vdat are provided:
+	Doctoral_diagnoses_at_inclusion_+-1year
+	Doctoral_diagnoses_recorded_till_inclusion_+1year
+	Doctoral_diagnoses_received_after_inclusion_year
+hvdat:
+When hdat and/or vdat are provided:
+	all_diagnoses
 
 
 

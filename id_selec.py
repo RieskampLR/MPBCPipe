@@ -5,6 +5,7 @@ Func to filter IDs by condition based on json file
 
 """
 
+import numpy as np
 
 def id_selection_func(tables, cond):
     
@@ -15,12 +16,8 @@ def id_selection_func(tables, cond):
         ids = tables[table]
         for col, val in filters.items():
             if col == "all_diagnoses":
-                for x in ids[col]:
-                    overlap = [i for i in x if i in val["values"]]
-                if overlap:
-                    #print(overlap)
-                    ids = ids[ids[col].apply(lambda lst: any(i in val["values"] for i in lst))]   
-                #print(len(ids[col]))
+                ids = ids[ids[col].apply(lambda lst: any(i in val["values"] for i in (lst if isinstance(lst, list) else [lst])))]
+                # line above: i in if else to make sure anything is handled as list and i goes through each entry
             else:
                 if val["type"] == "range":
                     if val["values"][0] == ">=":
@@ -42,8 +39,8 @@ def id_selection_func(tables, cond):
                     
         id_selection[table] = ids["StudieID"]
 
-    # IDs must match ALL conditions
 
+    # IDs must match ALL conditions
     common_ids = set.intersection(*(set(v) for v in id_selection.values()))
     #print(len(common_ids))
     

@@ -1,0 +1,8 @@
+{
+  "qdat": {},
+  "pdat": {},
+  "hvdat": {
+	  "hdia": {"type": "string", "values":["G20"]},
+	  "all_diagnoses": {"type": "string", "values":["E11", "G21"]}
+  }
+}
