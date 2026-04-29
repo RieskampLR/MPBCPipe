@@ -69,6 +69,7 @@ parser.add_argument("-hd", "--hdat") # -h is reserved by argparse for help
 parser.add_argument("-v", "--vdat")
 parser.add_argument("-cat", "--categories", required=True)
 parser.add_argument("-cond", "--conditions", required=True)
+parser.add_argument("-o", "--output")
 parser.add_argument("-s", "--sort", type=str, nargs="+", help="Column to sort by")
 parser.add_argument("-pt", "--pharma", action="store_true", help="Pharma pick ups summary table")
 parser.add_argument("-dt", "--diagnosis", nargs="*", default=None, help="Diagnosis cases summary table")
@@ -211,9 +212,15 @@ if len(sort_cols) > 0:
     thetable = thetable.sort_values(by=sort_cols)
 
 
-thetable.to_csv("filtered_table.tsv",
+#------------------------------------------------------------------------------
+# Output table saving
+#------------------------------------------------------------------------------
+
+thetable.to_csv(f"{(args.output or "")}_filtered_table.tsv",
                 sep='\t', index=False, index_label=None, na_rep='NA')
-thetable.to_excel("filtered_table.xlsx", index=False, na_rep='NA')
+
+thetable.to_excel(f"{(args.output or "")}_filtered_table.xlsx",
+                  index=False, na_rep='NA')
 
 
 #------------------------------------------------------------------------------
@@ -224,9 +231,10 @@ thetable.to_excel("filtered_table.xlsx", index=False, na_rep='NA')
 
 if args.pharma:
     pharma_summary = pharma_table_func(func_dats, common_ids)
-    pharma_summary.to_csv("pharma_summary_table.tsv",
-                    sep='\t', index=False, index_label=None, na_rep='NA')
-    pharma_summary.to_excel("pharma_summary_table.xlsx", index=False, na_rep='NA')
+    pharma_summary.to_csv(f"{(args.output or "")}_pharma_summary_table.tsv",
+                          sep='\t', index=False, index_label=None, na_rep='NA')
+    pharma_summary.to_excel(f"{(args.output or "")}_pharma_summary_table.xlsx",
+                            index=False, na_rep='NA')
 
 
 #------------------------------------------------------------------------------
@@ -243,9 +251,10 @@ if args.diagnosis != None:
         qdat_dias = None
 
     diagnosis_summary = diagnosis_table_func(func_dats, common_ids, dia_cols, qdat_dias)
-    diagnosis_summary.to_csv("diagnosis_summary_table.tsv",
-                sep='\t', index=False, index_label=None, na_rep='NA')
-    diagnosis_summary.to_excel("diagnosis_summary_table.xlsx", index=False, na_rep='NA')
+    diagnosis_summary.to_csv(f"{(args.output or "")}_diagnosis_summary_table.tsv",
+                             sep='\t', index=False, index_label=None, na_rep='NA')
+    diagnosis_summary.to_excel(f"{(args.output or "")}_diagnosis_summary_table.xlsx",
+                               index=False, na_rep='NA')
 
 
 

@@ -9,7 +9,7 @@ and QuestionnaireData_N1864_FINAL_CLEANED_210621
 
 Command to run the pipeline:
 python piper1.py -q QuestionnaireData_N1864_FINAL_CLEANED_210621 -p UT_R_LMED_14691_2021 -hd UT_R_PAR_SV_14691_2021 -v UT_R_PAR_OV_14691_2021 -cat categories.json -cond conditions.json
-Optional: -s example example -pt -dt example example
+Optional: -o output_name_prefix -s example example -pt -dt example example
 
 Flags:
 -s: The user can add this flag to specify the categories by which the output table should be sorted by.
