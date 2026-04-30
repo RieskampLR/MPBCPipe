@@ -52,8 +52,9 @@ def thetable_func (func_dats, cat_tables, common_ids):
         thetable[col] = new_val
 
     # Reformat hdia and alldia cols
-    thetable["hdia"] = thetable["hdia"].str.join(", ")
-    thetable["all_diagnoses"] = thetable["all_diagnoses"].str.join(", ")
+    if "hdia" in thetable:
+        thetable["hdia"] = thetable["hdia"].str.join(", ")
+        thetable["all_diagnoses"] = thetable["all_diagnoses"].str.join(", ")
 
     
     return thetable

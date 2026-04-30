@@ -100,9 +100,21 @@ conds_file = Path("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/conds_4
 '''
 # Input file checks
 # ...
+
+# Requesting Diagnosis table with no diagnosis data
+if hdat is None and vdat is None:
+    if args.diagnosis:
+        print("Please provide diagnosis data for the diagnosis summary table generation.\nIf no diagnosis data is available, please remove the -dt flag in the command line.")
+        exit()
+
+if pdat is None:
+    if args.pharma:
+        print("Please provide pharmacy data for the pharmacy summary table generation.\nIf no pharmacy data is available, please remove the -pt flag in the command line.")
+        exit()
+
   
 
-# Formatting and additional coloumns prep
+# More checks, formatting, and additional coloumns prep
 
 qdat = qdat.rename(columns={"Id": "StudieID"})
 
@@ -126,6 +138,15 @@ with open(conds_file) as json_file:
     cond = json.load(json_file)
 
 
+# Requesting columns based on data that is not provided
+if hdat is None and vdat is None:
+    if "hvdat" in cat or "hvdat" in cond:
+        print("Please provide diagnosis data for columns generated based on such data.\nIf no diagnosis data is available, please remove hvdat from your conditions and categories json files.")
+        exit()
+if pdat is None:
+    if "pdat" in cat or "pdat" in cond:
+        print("Please provide pharmacy data for columns generated based on such data.\nIf no pharmacy data is available, please remove pdat from your conditions and categories json files.")
+        exit()
 
 
 # List of cols containing diagnosis info
@@ -216,10 +237,10 @@ if len(sort_cols) > 0:
 # Output table saving
 #------------------------------------------------------------------------------
 
-thetable.to_csv(f"{(args.output or "")}_filtered_table.tsv",
+thetable.to_csv(f"{(args.output + '_') if args.output else ''}filtered_table.tsv",
                 sep='\t', index=False, index_label=None, na_rep='NA')
 
-thetable.to_excel(f"{(args.output or "")}_filtered_table.xlsx",
+thetable.to_excel(f"{(args.output + '_') if args.output else ''}filtered_table.xlsx",
                   index=False, na_rep='NA')
 
 
@@ -231,9 +252,9 @@ thetable.to_excel(f"{(args.output or "")}_filtered_table.xlsx",
 
 if args.pharma:
     pharma_summary = pharma_table_func(func_dats, common_ids)
-    pharma_summary.to_csv(f"{(args.output or "")}_pharma_summary_table.tsv",
+    pharma_summary.to_csv(f"{(args.output + '_') if args.output else ''}pharma_summary_table.tsv",
                           sep='\t', index=False, index_label=None, na_rep='NA')
-    pharma_summary.to_excel(f"{(args.output or "")}_pharma_summary_table.xlsx",
+    pharma_summary.to_excel(f"{(args.output + '_') if args.output else ''}pharma_summary_table.xlsx",
                             index=False, na_rep='NA')
 
 
@@ -251,9 +272,9 @@ if args.diagnosis != None:
         qdat_dias = None
 
     diagnosis_summary = diagnosis_table_func(func_dats, common_ids, dia_cols, qdat_dias)
-    diagnosis_summary.to_csv(f"{(args.output or "")}_diagnosis_summary_table.tsv",
+    diagnosis_summary.to_csv(f"{(args.output + '_') if args.output else ''}diagnosis_summary_table.tsv",
                              sep='\t', index=False, index_label=None, na_rep='NA')
-    diagnosis_summary.to_excel(f"{(args.output or "")}_diagnosis_summary_table.xlsx",
+    diagnosis_summary.to_excel(f"{(args.output + '_') if args.output else ''}diagnosis_summary_table.xlsx",
                                index=False, na_rep='NA')
 
 
