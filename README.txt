@@ -39,7 +39,8 @@ Json file formats and modifications:
 Categories:
 The json file for output table category specifications must contain a dictionary with "pdat", "qdat", and "hvdat" as keys,
 representing pharmacy, questionnaire, and hospital+doctoral visits data,
-and lists containing the requested categories from within the corresponding data sets as values
+and lists containing the requested categories from within the corresponding data sets as values.
+In qdat "Id" is to be noted as "StudieID" (the questionnaire header contains "Id").
 Conditions:
 The json file specifying the conditions under which samples are included in the output table must also contain a dictionary.
 Here the keys are the same as in the categories file.

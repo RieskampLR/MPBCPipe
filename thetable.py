@@ -51,10 +51,18 @@ def thetable_func (func_dats, cat_tables, common_ids):
                 new_val.append(val)
         thetable[col] = new_val
 
-    # Reformat hdia and alldia cols
-    if "hdia" in thetable:
-        thetable["hdia"] = thetable["hdia"].str.join(", ")
-        thetable["all_diagnoses"] = thetable["all_diagnoses"].str.join(", ")
+    # Reformat cols to non-lists
+    for col in thetable.columns:
+        thetable[col] = thetable[col].apply(lambda x: ", ".join(map(str, x)) if isinstance(x, list) else x)      
+    
+    # Cols with .0 floats to integers
+    for col in thetable.columns:
+        thetable[col] = thetable[col].apply(
+            lambda x: ", ".join(map(str, x)) if isinstance(x, list)             # map() converts each entry to str
+            else (int(float(x)) if isinstance(x, str) and x.replace('.', '', 1).isdigit() and float(x).is_integer()
+            else (int(x) if isinstance(x, (float, int)) and float(x).is_integer()
+            else x))
+        )
 
     
     return thetable
