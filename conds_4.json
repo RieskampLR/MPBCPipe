@@ -1,10 +1,10 @@
 {
   "qdat": {
-	  "Hoehn_Yahr": {"type": "values", "values": [3, 4]},
-	  "Age_Diagnosis": {"type": "range", "values": ["<=", 40]}
   },
-  "pdat": {},
+  "pdat": {
+	  "ATC": {"type": "string", "values":["^C05.*"]}
+  },
   "hvdat": {
-	  "all_diagnoses": {"type": "string", "values":["G20"]}
+	  "all_diagnoses": {"type": "string", "values":["&", "G20", "E.*", "!E11"]}
   }
 }

@@ -213,6 +213,10 @@ tables = {key: val for key, val in {
 
 common_ids = id_selection_func(tables, cond)
 
+if not common_ids:
+    print("There are no patients in your given data that meet all your conditions.")
+    exit()
+
 
 # -----------------------------------------------------------------------------
 # Output table generation and formatting
@@ -242,6 +246,14 @@ thetable.to_csv(f"{(args.output + '_') if args.output else ''}filtered_table.tsv
 
 thetable.to_excel(f"{(args.output + '_') if args.output else ''}filtered_table.xlsx",
                   index=False, na_rep='NA')
+
+
+#------------------------------------------------------------------------------
+# ID list generation and saving
+#------------------------------------------------------------------------------
+
+thetable[["StudieID"]].to_csv(f"{(args.output + '_') if args.output else ''}ids_list.csv", index=False, header=False)
+thetable[["StudieID"]].to_excel(f"{(args.output + '_') if args.output else ''}ids_list.xlsx", index=False, header=False)
 
 
 #------------------------------------------------------------------------------

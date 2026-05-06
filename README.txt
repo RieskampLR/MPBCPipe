@@ -48,7 +48,9 @@ The values in this case are again dictionaries. These contain the category that 
 The further dictionaries contain 1. "type" as a key followed by a string as a value
 and 2. "value" as key and a list stating the condition as a value.
 Depending on this condition's format in the list the string for the "type" key is either "values", "range", or "string".
-The conditions lists also allow for ">=" and "<=" in ranges and "any" as strings (stating to exclude empty / NA entries).
+The conditions lists also allow for ">=" and "<=" in ranges and "any" (stating to exclude empty / NA entries) and "none" as strings.
+If all entries in a string list should appear, the list should start with the entry "&", which functions as a marker, stating that all (instead of any) entries must appear in the selected IDs.
+
 
 If qdat, pdat, or hdat and vdat are not provided the json entries for these are to be removed from the categories and conditions files.
 
