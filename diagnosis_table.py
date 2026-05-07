@@ -68,29 +68,66 @@ def diagnosis_table_func(func_dats, common_ids, dia_cols, qdat_dias):
     diagnosis_summary = diagnosis_summary.merge(qdat[["StudieID", "PHENO"]], on='StudieID', how='left').rename(columns={'PHENO': 'Pheno_G20'})
     
     # G20_Conversion
-    half_condition = diagnosis_summary["diagnosis"].str.contains("G20", na=False)
+    half_condition = diagnosis_summary.groupby("StudieID")["diagnosis"].transform(lambda x: x.str.contains("G20", na=False).any()) # Indiv has G20 somewhere
+    
+    # one-way flag option to show only those that have G20 but are not included in qdat as control (likely due to developing PD later)
+    if "oneway_G20" in qdat_dias:
+        conv_cond = (~(diagnosis_summary["Pheno_G20"] == 1) & half_condition)
+        diagnosis_summary = diagnosis_summary.rename(columns={'G20_Conversion': 'Pheno_G20_Conv_1way'}) # rename col
+        qdat_dias = [x for x in qdat_dias if x != "oneway_G20"] # remove one-way from qdat_dias list
+    
+    # one-way flag option to show only those that do not have G20 in hvdat but are included in qdat case (likely due to no further doctoral visits)
+    elif "onewayother_G20" in qdat_dias:
+        conv_cond = ((diagnosis_summary["Pheno_G20"] == 1) & ~half_condition)
+        diagnosis_summary = diagnosis_summary.rename(columns={'G20_Conversion': 'Pheno_G20_Conv_1way_other'}) # rename col
+        qdat_dias = [x for x in qdat_dias if x != "onewayother_G20"] # remove one-way from qdat_dias list
+    
+    # default: Conversion in any direction
+    else:
+        conv_cond = (
+            ((diagnosis_summary["Pheno_G20"] != 1) & half_condition) |
+            ((diagnosis_summary["Pheno_G20"] == 1) & ~half_condition)
+        )
     diagnosis_summary["G20_Conversion"] = np.where( # returns one val where a condition is true, another where it is false
-        diagnosis_summary["Pheno_G20"].isna(),       # condition: Is NA val
+        diagnosis_summary["Pheno_G20"].isna(),      # condition: Is NA val
         np.nan,                                     # val if false: nan
-        (diagnosis_summary["Pheno_G20"] != 1) & half_condition | # val if true: boolean, 1 or 0
-        (diagnosis_summary["Pheno_G20"] == 1) & ~half_condition
+        conv_cond                                   # val if true: boolean, 1 or 0
     ).astype(int)
     
     
+    
     # Pheno-user-defined (from qdat)
-    if qdat_dias != None:
-        diagnosis_summary = diagnosis_summary.merge(qdat[["StudieID"] + qdat_dias], on="StudieID", how="left").rename(columns={c: f"Pheno_{c}" for c in qdat_dias})
-    
-    
+    if qdat_dias is not None:
+        merge_qdat_dias = [x for x in qdat_dias if x not in ["oneway_E11", "onewayother_E11"]] # exclude non-dia flag options
+        diagnosis_summary = diagnosis_summary.merge(qdat[["StudieID"] + merge_qdat_dias], on="StudieID", how="left").rename(columns={c: f"Pheno_{c}" for c in merge_qdat_dias}) 
+        
 
     # E11_Conversion
     if "Diabetes" in qdat_dias:
-        half_condition = diagnosis_summary["diagnosis"].str.contains("E11", na=False)
+        half_condition = diagnosis_summary.groupby("StudieID")["diagnosis"].transform(lambda x: x.str.contains("E11", na=False).any()) # Indiv has E11 somewhere
+        
+        # one-way flag option to show only those that have E11 but did not say so in qdat
+        if "oneway_E11" in qdat_dias:
+            conv_cond = (~(diagnosis_summary["Pheno_Diabetes"] == 1) & half_condition)
+            diagnosis_summary = diagnosis_summary.rename(columns={'E11_Conversion': 'Pheno_E11_Conv_1way'}) # rename col
+            qdat_dias = [x for x in qdat_dias if x != "oneway_E11"] # remove one-way from qdat_dias list
+        
+        # one-way flag option to show only those that do not have E11 in hvdat but astate to have Diabetes in qdat
+        elif "onewayother_E11" in qdat_dias:
+            conv_cond = ((diagnosis_summary["Pheno_Diabetes"] == 1) & ~half_condition)
+            diagnosis_summary = diagnosis_summary.rename(columns={'E11_Conversion': 'Pheno_E11_Conv_1way_other'}) # rename col
+            qdat_dias = [x for x in qdat_dias if x != "onewayother_E11"] # remove one-way from qdat_dias list
+        
+        # default: Conversion in any direction
+        else:
+            conv_cond = (
+                ((diagnosis_summary["Pheno_Diabetes"] != 1) & half_condition) |
+                ((diagnosis_summary["Pheno_Diabetes"] == 1) & ~half_condition)
+            )
         diagnosis_summary["E11_Conversion"] = np.where( # returns one val where a condition is true, another where it is false
-            diagnosis_summary["Pheno_Diabetes"].isna(),       # condition: Is NA val
+            diagnosis_summary["Pheno_Diabetes"].isna(), # condition: Is NA val
             np.nan,                                     # val if true: nan
-            (diagnosis_summary["Pheno_Diabetes"] != 1) & half_condition | # val if false: boolean, 1 or 0
-            (diagnosis_summary["Pheno_Diabetes"] == 1) & ~half_condition
+            conv_cond                                   # val if false: boolean, 1 or 0
         ).astype(int)  
     
 
@@ -98,14 +135,30 @@ def diagnosis_table_func(func_dats, common_ids, dia_cols, qdat_dias):
     cols = diagnosis_summary.columns.tolist()
     cols.insert(1, cols.pop(cols.index("Inclusion_Year")))
     cols.insert(3, cols.pop(cols.index("Pheno_G20")))
-    cols.insert(4, cols.pop(cols.index("G20_Conversion")))
-    if "Diabetes" in qdat_dias:
+    
+    if "G20_Conversion" in diagnosis_summary:
+        cols.insert(4, cols.pop(cols.index("G20_Conversion")))
+    elif "Pheno_G20_Conv_1way" in diagnosis_summary:
+        cols.insert(4, cols.pop(cols.index("Pheno_G20_Conv_1way")))
+    elif 'Pheno_G20_Conv_1way_other' in diagnosis_summary:
+        cols.insert(4, cols.pop(cols.index("Pheno_G20_Conv_1way_other")))
+    
+    if "E11_Conversion" in diagnosis_summary:
         cols.insert(5, cols.pop(cols.index("E11_Conversion")))
+    elif "Pheno_E11_Conv_1way" in diagnosis_summary:
+        cols.insert(5, cols.pop(cols.index("Pheno_E11_Conv_1way")))
+    elif 'Pheno_E11_Conv_1way_other' in diagnosis_summary:
+        cols.insert(5, cols.pop(cols.index("Pheno_E11_Conv_1way_other")))
+
     if qdat_dias != None:
         for i, c in enumerate([f"Pheno_{dia}" for dia in qdat_dias]):
             cols.insert(5 + i, cols.pop(cols.index(c)))
+    
     diagnosis_summary = diagnosis_summary[cols]
-
+    
+    
+    # Replace NA with blanks
+    diagnosis_summary = diagnosis_summary.fillna('')
 
     
     return diagnosis_summary

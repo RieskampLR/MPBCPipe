@@ -68,3 +68,22 @@ When hdat and/or vdat are provided:
 
 
 
+
+
+Diagnosis table:
+...
+- E11 conversion is only calculated and displayed if Diabetes is added as an argument to the -dt flag
+- The conversion for both, G20 and E11, can be based on one- or both-way:
+	Both ways (default): Any case is considered "1" (conversion detected) if the qdat diagnosis and the hvdat diagnoses don't match
+						(so an individual has a diagnosis stated in qdat which is not confirmed in hvdat, or does not have a diagnosis stated in qdat which is stated in hvdat)
+	One way: Only cases that have a diagnosis in hvdat but not in qdat (Pheno_G20 is "0") are considered "1" (conversion detected).
+			 This can be used to filter e.g., for individuals that likely developed e.g. G20 after questionnaire inclusion.
+			 To use this option add oneway_G20 or oneway_E11 after the -dt flag. If other qdat diagnosis columns are requested, it can simply be listed among them.
+	Other way: Only cases that do not have a diagnosis in hvdat but have/state this diagnosis in qdat (Pheno_E11/Diabetes is "1") are considered "1" (conversion detected).
+			 This can be used to filter e.g., for individuals that stated to have Diabetes but have no confirmed diagnosis of this in hvdat.
+			 To use this option add onewayother_G20 or onewayother_E11 after the -dt flag. If other qdat diagnosis columns are requested, it can simply be listed among them.
+
+
+
+
+
