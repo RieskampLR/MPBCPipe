@@ -1,0 +1,10 @@
+{
+  "qdat":
+  ["StudieID",
+  "sex",
+  "City"],
+  "pdat": 
+  [],
+  "hvdat":
+  ["all_diagnoses"]
+}

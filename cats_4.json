@@ -1,8 +1,9 @@
 {
+  "qdat":
+  ["StudieID",
+  "Doctoral_diagnoses_at_inclusion_+-1year"],
   "pdat": 
   ["ATC"],
-  "qdat":
-  ["StudieID"],
   "hvdat":
   ["hdia",
   "all_diagnoses"]

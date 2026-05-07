@@ -78,6 +78,9 @@ def diagnosis_vs_inclusion_time_func(func_dats):
         
         
     qdat = qdat.copy() # removes saved memory of column movement
+    
+    # Turn str entries to lists by commas
+    qdat[qdat.select_dtypes(include="object").columns] = qdat.select_dtypes(include="object").apply(lambda s: s.fillna("").apply(lambda x: x.split(",") if isinstance(x, str) else x))
         
     return qdat
         

@@ -8,9 +8,13 @@ Func to filter IDs by condition based on json file
 import re
 
 # Helper function for regex matching and going through list entries (+ treating single string as list)
-def match(v, x):
-    return any(re.fullmatch(v, item) for item in (x if isinstance(x, list) else [x]))
+import pandas as pd
+import re
 
+def match(v, x):
+    if x is None or (isinstance(x, float) and pd.isna(x)): # handles NaNs (cause re.fullmatch sees them as floats)
+        return False
+    return any(re.fullmatch(v, str(item)) for item in (x if isinstance(x, list) else [x]))
 
 def id_selection_func(tables, cond):
     

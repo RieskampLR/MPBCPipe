@@ -1,0 +1,10 @@
+{
+  "qdat":
+  ["StudieID",
+  "Age_Inclusion",
+  "Doctoral_diagnoses_recorded_till_inclusion_+1year"],
+  "pdat": 
+  [],
+  "hvdat":
+  ["all_diagnoses"]
+}

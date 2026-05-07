@@ -1,0 +1,13 @@
+{
+  "qdat":
+  ["StudieID",
+  "Doctoral_diagnoses_at_inclusion_+-1year",
+  "Doctoral_diagnoses_recorded_till_inclusion_+1year",
+  "Doctoral_diagnoses_received_after_inclusion_year"],
+  "pdat": 
+  ["ATC",
+  "produkt"],
+  "hvdat":
+  ["hdia",
+  "all_diagnoses"]
+}
