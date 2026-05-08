@@ -46,6 +46,9 @@ def pharma_table_func(func_dats, common_ids):
     pharma_summary["span"] = pharma_summary["min_date"] + " - " + pharma_summary["max_date"]
     pharma_summary = pharma_summary.drop(columns=["min_date", "max_date"])
     
+    # Replace NA with blanks
+    pharma_summary = pharma_summary.fillna('')
+    
     return pharma_summary
 
 
