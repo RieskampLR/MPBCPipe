@@ -62,11 +62,11 @@ def id_selection_func(tables, cond):
             else:
                 ids = ids[ids[col].isin(val["values"])]
                     
+        ids["StudieID"] = ids["StudieID"].apply(lambda x: x[0] if isinstance(x, list) else x) # Ensuring all IDs are string entries (not lists)
         id_selection[table] = ids["StudieID"]
 
 
     # IDs must match ALL conditions
-    ids["StudieID"] = ids["StudieID"].apply(lambda x: x[0] if isinstance(x, list) else x) # Ensuring all IDs are string entries (not lists)
     common_ids = set.intersection(*(set(v) for v in id_selection.values()))
     
     
