@@ -13,7 +13,7 @@ def diagnosis_table_func(func_dats, common_ids, dia_cols, qdat_dias):
     hvdat = func_dats["hvdat"]
     qdat = func_dats["qdat"]
     
-    
+    # Pivot dates into ID-rows
     id_to_dias = hvdat.melt(id_vars=["StudieID", "INDATUM"],        # sets identifier var
                              value_vars=dia_cols,      # cols to pivot by id_vars
                              value_name="diagnosis"     # new col name

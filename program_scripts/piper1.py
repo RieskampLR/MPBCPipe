@@ -57,9 +57,8 @@ from thetable import thetable_func
 
 
 # Storing Paths of arguments in variables:
-
+    
 warnings.simplefilter("ignore", category=pd.errors.PerformanceWarning)
-
 
 # Set up argument parser
 parser = argparse.ArgumentParser(description="Specify input files and optionally: Columns to sort by and other summary tables")
@@ -76,6 +75,7 @@ parser.add_argument("-dt", "--diagnosis", nargs="*", default=None, help="Diagnos
 args = parser.parse_args()
 
 
+# Reading in and assigning files
 qdat = pd.read_csv(Path(args.qdat), sep="\t") if args.qdat else None
 pdat = pd.read_table(Path(args.pdat), encoding='unicode_escape') if args.pdat else None
 hdat = pd.read_table(Path(args.hdat), encoding='unicode_escape', low_memory=False) if args.hdat else None
@@ -84,12 +84,14 @@ cats_file = Path(args.categories)
 conds_file = Path(args.conditions)
 
 
+# Sort flag set up
 if args.sort is not None:
     sort_cols = list(args.sort)
 else:
     sort_cols = []
 
-'''
+
+'''   For direct use in Spyder only
 qdat = pd.read_table(Path("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/qdat_anonymised.tsv"))
 pdat = pd.read_table(Path("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/pdat_anonymised.tsv"), encoding='unicode_escape')
 hdat = pd.read_table(Path("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/hdat_anonymised.tsv"), encoding='unicode_escape', low_memory=False)
@@ -98,8 +100,8 @@ cats_file = Path("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/cats_4.j
 conds_file = Path("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/conds_4.json")
 
 '''
-# Input file checks
-# ...
+
+# Error catches
 
 # Requesting Diagnosis table with no diagnosis data
 if hdat is None and vdat is None:

@@ -1,38 +1,57 @@
 README
 
 Description:
-piper1.py filters and combines the datasets
+piper1.py is a flexible program filtering, combining, and stratifying data from the Parkinsons registry, Styrelsen, and ... !!!!!!!???????
+It enables the identification of individuals meeting certain user-defined conditions and provides output tables with user-defined categories
+and optional, additional coloumns generated based on information provided across the data sets.
+The program output a table with all user-specified columns of the individual's IDs matching the user-specified conditions.
+Additionally, it provides a file listing the IDs and can produce a table with further information on diagnoses and a table with summarised pharmacy data.
+The program is and will be used in the Translational Neurogenetics lab at Lund University to enable efficient data analysis,
+including general data inspection and polygenic risk scores analyses.
+The datasets currently available to the lab are
 UT_R_LMED_14691_2021,
 UT_R_PAR_OV_14691_2021,
 UT_R_PAR_SV_14691_2021,
 and QuestionnaireData_N1864_FINAL_CLEANED_210621
 
-Command to run the pipeline:
+Command to run the program:
 python piper1.py -q QuestionnaireData_N1864_FINAL_CLEANED_210621 -p UT_R_LMED_14691_2021 -hd UT_R_PAR_SV_14691_2021 -v UT_R_PAR_OV_14691_2021 -cat categories.json -cond conditions.json
 Optional: -o output_name_prefix -s example example -pt -dt example example
 
+
+Required packages:
+python
+	pandas
+	numpy
+openpyxl
+
+
+Usage:
+The program requires the questionnaire data (qdat) and can optionally include hospital (hdat), doctoral visits (vdat), and pharmacy (pdat) data.
+It further requires the user to provide 2 json files. One with the columns/categories the output table should include
+and one with the conditions for individuals to be included in the final output table. Further details on these are described below
+and a range of example files are provided with the program on git hub.
+Besides the flags indicating input files, the program has 4 further flags that can be added in the command line.
+These and their functions are described in the section "Flags" below.
+
+
+
 Flags:
+-o:
 -s: The user can add this flag to specify the categories by which the output table should be sorted by.
 The first category stated is the main sort variable, the second the sub-sorting variable and so on.
 The categories have to be included in the categories displayed in the output table. They are to be listed without "" and separated by tab space.
--p: The addition of this flag leads to an additional output table with pharmacy data on the patients included in the main output table.
+-pt: The addition of this flag leads to an additional output table with pharmacy data on the patients included in the main output table.
 The pharmacy data table shows the medications (subnamn) picked up by each individual, the number of pick ups, the time span across which pick ups occurred, and the specific pick up dates.
 This flag does not take any arguments.
+-dt: 
+
 
 Json files and user specifications:
 The user is required to provide
 - A json file stating the categories wanted in the output table
 - A json file stating the conditions for individuals being included in the output table
 Example files are available and can be easily modified.
-
-
-Installations:
-python
-	pandas
-	numpy
-	...
-openpyxl
-...
 
 
 Json file formats and modifications:
@@ -53,7 +72,6 @@ If all entries in a string list should appear, the list should start with the en
 
 
 If qdat, pdat, or hdat and vdat are not provided the json entries for these are to be removed from the categories and conditions files.
-
 
 
 The script calculates additional categories from combining data across the sets. These categories can be included in the json files and currently include:

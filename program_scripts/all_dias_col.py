@@ -17,7 +17,5 @@ def all_diagnoses_func(func_dats, dia_cols):
     # Remove nan entries
     hvdat["all_diagnoses"] = hvdat["all_diagnoses"].apply(lambda x: [i for i in x if i != "nan" and pd.notna(i)])
     
-    #for row in hvdat["all_diagnoses"].values:
-     #   print(row)
 
     return hvdat

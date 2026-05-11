@@ -21,7 +21,8 @@ def diagnosis_vs_inclusion_time_func(func_dats):
     cond = func_dats["cond"]
     
     col_names = ["Doctoral_diagnoses_received_after_inclusion_year", "Doctoral_diagnoses_at_inclusion_+-1year", "Doctoral_diagnoses_recorded_till_inclusion_+1year"]
-
+    
+    # Calculate columns f needed in output table
     if any(col in categories["qdat"] or col in cond["qdat"] for col in col_names):
 
         # Participants with diagnosis at inclusion +-1
