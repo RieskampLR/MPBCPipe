@@ -9,23 +9,39 @@ import pandas as pd
 import numpy as np
 
 
-def pharma_table_func(func_dats, common_ids, cond, filtered):
+def pharma_table_func(func_dats, common_ids, cond, filtered, incl_filter):
     pdat = func_dats["pdat"]
+    qdat = func_dats ["qdat"]
     
     # groupby object for group in grouped func
     grouped = pdat[pdat["StudieID"].isin(common_ids)].groupby(["StudieID","subnamn"])
     
+    # Inclusion year dictionary
+    incl_map = qdat.set_index("StudieID")["Inclusion_Year"].to_dict() # Get incl year (item) for each ID (key) in dic
+    
     # Collect pick up cases info
     substance_info_rows = []
     for (stu_id, prod), group in grouped:
+        incl_year = incl_map.get(stu_id)
+        # upto+1 incl_year filter
+        if incl_filter == "upto":
+            group = group[pd.to_datetime(group["EDATUM"]) <= pd.to_datetime(f"{incl_year+1}-12-31")] # exclude all dates out of range
+        # at+-1 incl_year filter
+        elif incl_filter == "at":
+            group = group[(pd.to_datetime(group["EDATUM"]) >= pd.to_datetime(f"{incl_year-1}-01-01")) &
+                          (pd.to_datetime(group["EDATUM"]) <= pd.to_datetime(f"{incl_year+1}-12-31"))]
+        # after incl_year filter
+        elif incl_filter == "after": 
+            group = group[pd.to_datetime(group["EDATUM"]) > pd.to_datetime(f"{incl_year}-12-31")] 
         dates = sorted(group["EDATUM"].tolist())   # all pickup dates for this ID+substance
         count = len(dates)               # number of pickups
-        substance_info_rows.append([stu_id, prod, count] + dates)
+        substance_info_rows.append([stu_id, prod, count] + dates)  
     
     # Collect diagnosis cases info
     pharma_summary = pd.DataFrame(substance_info_rows)
     # Col headers
     pharma_summary.columns = ["StudieID", "subnamn", "number_of_pickups"] + list(pharma_summary.columns[3:])
+    pharma_summary = pharma_summary[pharma_summary["number_of_pickups"] != 0]
     
     # Time frame column
     # Get date col names
@@ -52,9 +68,11 @@ def pharma_table_func(func_dats, common_ids, cond, filtered):
     # Filter option for displayed subnamn entries
     if filtered == True:
         pharma_summary = pharma_summary[pharma_summary["subnamn"].isin(cond["pdat"]["subnamn"]["values"])]
-        
-    # Filter by inclusion year
-    
+            
+    if incl_filter is not None:
+        # Add incl year col
+        pharma_summary = pharma_summary.merge(qdat[["StudieID", "Inclusion_Year"]], on="StudieID", how="left")
+        pharma_summary.insert(1, "Inclusion_Year", pharma_summary.pop("Inclusion_Year"))      
     
     return pharma_summary
 
