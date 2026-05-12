@@ -71,6 +71,7 @@ parser.add_argument("-cond", "--conditions", required=True)
 parser.add_argument("-o", "--output")
 parser.add_argument("-s", "--sort", type=str, nargs="+", help="Column to sort by")
 parser.add_argument("-pt", "--pharma", action="store_true", help="Pharma pick ups summary table")
+parser.add_argument("-ptf", "--pharmafiltered", action="store_true", help="Filtered pharma pick ups summary table")
 parser.add_argument("-dt", "--diagnosis", nargs="*", default=None, help="Diagnosis cases summary table")
 args = parser.parse_args()
 
@@ -265,12 +266,21 @@ thetable[["StudieID"]].to_excel(f"{(args.output + '_') if args.output else ''}id
 # by pharma product pick up
 
 if args.pharma:
-    pharma_summary = pharma_table_func(func_dats, common_ids)
+    pharma_summary = pharma_table_func(func_dats, common_ids, cond, filtered=False)
     pharma_summary.to_csv(f"{(args.output + '_') if args.output else ''}pharma_summary_table.tsv",
                           sep='\t', index=False, index_label=None, na_rep='NA')
     pharma_summary.to_excel(f"{(args.output + '_') if args.output else ''}pharma_summary_table.xlsx",
                             index=False, na_rep='NA')
 
+# filter for only those subnamn requested in conditions
+
+if args.pharmafiltered:
+    pharma_summary = pharma_table_func(func_dats, common_ids, cond, filtered=True)
+    pharma_summary.to_csv(f"{(args.output + '_') if args.output else ''}pharma_summary_table.tsv",
+                          sep='\t', index=False, index_label=None, na_rep='NA')
+    pharma_summary.to_excel(f"{(args.output + '_') if args.output else ''}pharma_summary_table.xlsx",
+                            index=False, na_rep='NA')
+    
 
 #------------------------------------------------------------------------------
 # Diagnosis table generation

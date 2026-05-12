@@ -104,4 +104,5 @@ Diagnosis table:
 
 
 
-
+Pharma table:
+- filtered based on subnamn

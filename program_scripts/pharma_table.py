@@ -9,7 +9,7 @@ import pandas as pd
 import numpy as np
 
 
-def pharma_table_func(func_dats, common_ids):
+def pharma_table_func(func_dats, common_ids, cond, filtered):
     pdat = func_dats["pdat"]
     
     # groupby object for group in grouped func
@@ -18,7 +18,7 @@ def pharma_table_func(func_dats, common_ids):
     # Collect pick up cases info
     substance_info_rows = []
     for (stu_id, prod), group in grouped:
-        dates = group["EDATUM"].tolist()   # all pickup dates for this ID+substance
+        dates = sorted(group["EDATUM"].tolist())   # all pickup dates for this ID+substance
         count = len(dates)               # number of pickups
         substance_info_rows.append([stu_id, prod, count] + dates)
     
@@ -48,6 +48,13 @@ def pharma_table_func(func_dats, common_ids):
     
     # Replace NA with blanks
     pharma_summary = pharma_summary.fillna('')
+    
+    # Filter option for displayed subnamn entries
+    if filtered == True:
+        pharma_summary = pharma_summary[pharma_summary["subnamn"].isin(cond["pdat"]["subnamn"]["values"])]
+        
+    # Filter by inclusion year
+    
     
     return pharma_summary
 
