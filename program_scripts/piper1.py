@@ -43,6 +43,7 @@ Author: Lea Rachel Rieskamp
 
 from pathlib import Path
 import argparse
+import sys
 import json
 import pandas as pd
 import numpy as np
@@ -93,6 +94,10 @@ else:
     
     
 # pharma flags set up
+if "-pt" in sys.argv and "-ptf" in sys.argv:
+    print("Please choose either -pt or -ptf")
+    exit()
+
 if args.pharma is not None:
     incl_filter = args.pharma
 elif args.pharmafiltered is not None:

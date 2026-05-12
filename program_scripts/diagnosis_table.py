@@ -30,7 +30,7 @@ def diagnosis_table_func(func_dats, common_ids, dia_cols, qdat_dias):
     # Collect diagnosis cases info
     dias_info_rows = []
     for [stu_id, dia], group in grouped:
-        dates = group["INDATUM"].tolist()   # all visit dates
+        dates = sorted(group["INDATUM"].tolist())   # all visit dates in order
         count = len(dates)               # number of this diagnosis received
         dias_info_rows.append([stu_id, dia, count] + dates)
     

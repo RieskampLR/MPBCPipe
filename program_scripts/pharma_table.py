@@ -33,7 +33,7 @@ def pharma_table_func(func_dats, common_ids, cond, filtered, incl_filter):
         # after incl_year filter
         elif incl_filter == "after": 
             group = group[pd.to_datetime(group["EDATUM"]) > pd.to_datetime(f"{incl_year}-12-31")] 
-        dates = sorted(group["EDATUM"].tolist())   # all pickup dates for this ID+substance
+        dates = sorted(group["EDATUM"].tolist())   # all pickup dates for this ID+substance in order
         count = len(dates)               # number of pickups
         substance_info_rows.append([stu_id, prod, count] + dates)  
     
