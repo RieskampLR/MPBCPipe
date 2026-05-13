@@ -1,108 +1,589 @@
-README
+# MultiParkPiper
 
-Description:
-piper1.py is a flexible program filtering, combining, and stratifying data from the Parkinsons registry, Styrelsen, and ... !!!!!!!???????
-It enables the identification of individuals meeting certain user-defined conditions and provides output tables with user-defined categories
-and optional, additional coloumns generated based on information provided across the data sets.
-The program output a table with all user-specified columns of the individual's IDs matching the user-specified conditions.
-Additionally, it provides a file listing the IDs and can produce a table with further information on diagnoses and a table with summarised pharmacy data.
-The program is and will be used in the Translational Neurogenetics lab at Lund University to enable efficient data analysis,
-including general data inspection and polygenic risk scores analyses.
-The datasets currently available to the lab are
-UT_R_LMED_14691_2021,
-UT_R_PAR_OV_14691_2021,
-UT_R_PAR_SV_14691_2021,
-and QuestionnaireData_N1864_FINAL_CLEANED_210621
+Version: 1.00  
+Date: 2026-02-28  
+Author: Lea Rachel Rieskamp
+Supervision: Maria Swanberg, Translational Neurogenetics Lab, Lund University
 
-Command to run the program:
-python piper1.py -q QuestionnaireData_N1864_FINAL_CLEANED_210621 -p UT_R_LMED_14691_2021 -hd UT_R_PAR_SV_14691_2021 -v UT_R_PAR_OV_14691_2021 -cat categories.json -cond conditions.json
-Optional: -o output_name_prefix -s example example -pt -dt example example
+------------------------------------------------------------------------------------------------------------------------------------------------------
+
+# Overview
+
+piper1.py is a flexible Python pipeline for filtering, combining, stratifying, and summarising clinical and registry data used in Parkinson's disease research.
+The script integrates questionnaire, diagnosis, and pharmacy datasets and enables users to:
+
+- Identify individuals matching user-defined conditions
+- Generate filtered output tables with user-defined columns
+- Combine information across datasets
+- Generate additional columns with information derived from cross-table analysis
+- Produce optional diagnosis summary tables
+- Produce optional pharmacy summary tables
+- Export all results as .tsv, .xlsx, and ID list files
+
+The program is currently used in the Translational Neurogenetics Lab at Lund University for:
+- General cohort inspection
+- Phenotype stratification
+- Longitudinal diagnosis analyses
+- Cross-table validation and consistency checks
+- Polygenic risk score analyses
+- Medication analyses
+
+------------------------------------------------------------------------------------------------------------------------------------------------------
+
+# Supported input datasets
+
+The pipeline currently supports the following datasets:
+
+- QuestionnaireData_N1864_FINAL_CLEANED_210621	(Questionnaire / phenotype data)
+- UT_R_LMED_14691_2021							(Medication pick-up registry )
+- UT_R_PAR_SV_14691_2021						(Hospital diagnosis registry )
+- UT_R_PAR_OV_14691_2021						(Outpatient/doctoral visit diagnosis registry)
+
+For efficiency purposes these are referred to in my script and the following descriptions as qdat, pdat, hdat, and vdat, respectively.
+hvdat refers to the combined vdat and hdat data.
+
+------------------------------------------------------------------------------------------------------------------------------------------------------
+
+# Requirements
+
+## Python packages
+
+- pandas
+- numpy
+- openpyxl
+
+Install with:
+pip install pandas numpy openpyxl
+
+------------------------------------------------------------------------------------------------------------------------------------------------------
+
+# Input pre-processing
+
+All input files must first be converted to tsv format using the provided csv_to_tsv conversion script before running the pipeline.
+
+------------------------------------------------------------------------------------------------------------------------------------------------------
+
+# Usage
+
+## Basic command
+
+python piper1.py -q qdat.tsv -cat categories.json -cond conditions.json
+
+## Full example
+
+python piper1.py \
+-q qdat.tsv \
+-p pdat.tsv \
+-hd hdat.tsv \
+-v vdat.tsv \
+-cat categories.json \
+-cond conditions.json
+
+## Example with optional flags and example flag arguments
+
+python piper1.py \
+-q qdat.tsv \
+-p pdat.tsv \
+-hd hdat.tsv \
+-v vdat.tsv \
+-cat categories.json \
+-cond conditions.json \
+-o PD_patients \
+-s Age_Diagnosis StudieID \
+-pt after \
+-dt Diabetes oneway_G20
+
+------------------------------------------------------------------------------------------------------------------------------------------------------
+
+# Command line arguments
+
+## Required arguments
+
+-cat, --categories		JSON file specifying output columns/categories
+-cond, --conditions		JSON file specifying filtering conditions
+
+## Optional input files
+
+-q, --qdat				Questionnaire dataset
+-p, --pdat				Pharmacy dataset
+-hd, --hdat				Hospital diagnosis dataset
+-v, --vdat				Doctoral/outpatient diagnosis dataset
+
+## Optional output & processing flags
+
+-o, --output			Prefix added to all generated output files
+-s, --sort				Columns to sort the final output table by
+-pt, --pharma			Generate pharmacy summary table
+-ptf, --pharmafiltered	Generate filtered pharmacy summary table
+-dt, --diagnosis		Generate diagnosis summary table
+
+------------------------------------------------------------------------------------------------------------------------------------------------------
+
+# Flag details & examples
+
+## -o
+
+Adds a prefix to all output files.
+Example: -o Parkinsons_subset
+Produces files such as:
+Parkinsons_subset_filtered_table.tsv
+Parkinsons_subset_ids_list.csv
+
+## -s
+
+Sorts the final output table vertically by one or more columns.
+Syntax: -s column1 column2 column3
+The first column is the primary sort variable, the second is the secondary sort variable, etc.
+Example: -s Age_Diagnosis StudieID
+Important: Sort columns must also be included in the categories JSON file.
+
+## -pt
+
+Generates a pharmacy summary table (described in further detail under Pharma summary table below).
+Optional arguments:
+upto
+at
+after
+These define filtering relative to inclusion year.
+Example: -pt after
+
+## -ptf
+
+Same as -pt, but restricts the displayed output to pharmacy entries matching the requested subnamn conditions.
+Example: -ptf after
+Important: -pt and -ptf cannot be used simultaneously.
+
+## -dt
+
+Generates a diagnosis summary table (described in further detail under Diagnosis summary table below).
+Optional arguments can specify:
+qdat diagnosis columns to be included
+diagnosis conversion analysis modes
+Example: -dt Diabetes
+Example with conversion mode: -dt oneway_G20
+Example with multiple arguments: -dt Diabetes Depression oneway_G20
+
+------------------------------------------------------------------------------------------------------------------------------------------------------
+
+# Output files
+
+The pipeline generates the following output files as .tsv and excel files:
+
+filtered_table.tsv/xlsx				Main filtered output table
+ids_list.tsv/xlsx					Included patient IDs
+
+Optional outputs:
+
+pharma_summary_table.tsv/xlsx		Pharmacy summary table
+diagnosis_summary_table.tsv/xlsx	Diagnosis summary table
+
+------------------------------------------------------------------------------------------------------------------------------------------------------
+
+# JSON configuration files
+
+The pipeline requires two JSON files:
+
+categories.json
+conditions.json
+
+Their structuring and use are described in the following below.
+Example files are provided on GitHub and can be adjusted easily.
+
+------------------------------------------------------------------------------------------------------------------------------------------------------
+
+# Categories JSON file
+
+The categories JSON defines which columns should appear in the final output table.
+The file contains a simple dictionary with dataset names as keys and lists of column names as items:
+
+## Basic structure
+
+{
+  "qdat": [],
+  "pdat": [],
+  "hvdat": []
+}
+
+## Example:
+
+{
+  "qdat":
+  ["StudieID",
+  "Doctoral_diagnoses_at_inclusion_+-1year"],
+
+  "pdat":
+  ["ATC",
+  "produkt"],
+
+  "hvdat":
+  ["hdia",
+  "all_diagnoses"]
+}
+
+## Important Notes
+
+qdat should contain "StudieID" (noted as "id" in the original file).
+The file can contain additional column names (not present in the original data sets).
+These are generated by the program based on data stratification within and across tables (described in detail under Additional generated columns).
+
+------------------------------------------------------------------------------------------------------------------------------------------------------
+
+# Conditions JSON file
+
+The conditions JSON defines which individuals are included in the final output table.
+The file contains nested dictionaries with dataset names as top-level keys with dictionaries as items.
+These nested dictionaries contain column names as keys and again dictionaries as items,
+which contain "type" as a key with a string as the item followed by "values" as a key and a list as the item.
+The nesting represents the structure:
+dataset --> column/category --> condition imposed on it
+
+## Basic structure
+
+{
+  "qdat": {},
+  "pdat": {},
+  "hvdat": {}
+}
+
+## Condition setting format
+
+To set a condition the user needs to specify the "type" of condition under the key "type".
+Supported types are:
+string
+range
+values
+
+Example:
+{
+  "type": "range",
+  "values": [5, 10]
+}
+
+### Values conditions
+
+Used for numerical values filtering, e.g., to include individuals at specific Hoehn&Yahr stages.
+
+Basic example:
+{
+  "Hoehn_Yahr": {
+    "type": "values",
+	"values": [3, 5]
+  }
+}
+Filters for all individuals that have Hoehn&Yahr stage of 3 OR 5.
+
+### Range conditions
+
+Used for numerical range filtering, e.g., to include any individuals within an age range.
+
+Basic example:
+{
+  "type": "range",
+  "values": [20, 40]
+}
+Where the outer limit values, 20 and 40, are included in the selected range.
+
+#### Supported operators:
+
+>=
+<=
+>
+<
+
+Example:
+{
+  "Age_Diagnosis": {
+    "type": "range",
+    "values": ["<=", 40]
+  }
+}
+Filters for all individuals that received their diagnosis at 40 or younger.
+
+### String conditions
+
+Used for text matching, e.g., diagnosis or medication codes.
+Capable of regex matching.
+
+Basic example:
+{
+  "hvdat": {
+    "all_diagnoses": {
+      "type": "string",
+      "values": ["G20"]
+    }
+  }
+}
+Filters for individuals having "G20" in "all_diagnoses" (an hvdat column).
+
+#### Match to exclude:
+
+Individuals can also be EXCLUDED from the final table by matching a condition.
+To exclude if a string is matched, begin the string with: "!"
+Example:	["!G20"]
+Filters for individuals NOT having G20.
+
+#### Multiple match conditions:
+
+Match any - Example:	["G20", "E11"]
+Filters for all individuals containing G20 AND/OR E11.
+
+Match both - Example: 	["&", "G20", "E11"]
+Filters for all individuals containing G20 AND E11.
+If all entries must match, begin the list with: "&"
+
+Complex combination - Example: ["&", "G20", "E.*", "!E11"]
+Filters for all individuals that have G20 AND have any diagnosis starting with E, but NOT E11.
+
+#### Special Conditions:
+
+any
+Includes only non-empty entries.
+Example:
+{
+  "produkt": {
+    "type": "string",
+    "values": ["any"]
+  }
+}
+
+none
+Matches empty and na entries.
+Example:
+{
+  "produkt": {
+    "type": "string",
+    "values": ["none"]
+  }
+}
+
+## Example condition JSON
+{
+  "qdat": {
+  },
+  "pdat": {
+    "ATC": {
+      "type": "string",
+      "values": ["^C05.*"]
+    }
+  },
+  "hvdat": {
+    "all_diagnoses": {
+      "type": "string",
+      "values": ["G20"]
+    }
+  }
+}
+
+------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Additional Generated Columns
+
+The pipeline generates additional derived columns when diagnosis data (hdat and/or vdat) is provided.
+
+Additional qdat Columns
+
+Available when hdat and/or vdat are included:
+
+Column	Description
+Doctoral_diagnoses_at_inclusion_+-1year	Diagnoses around inclusion year
+Doctoral_diagnoses_recorded_till_inclusion_+1year	Diagnoses recorded up to inclusion
+Doctoral_diagnoses_received_after_inclusion_year	Diagnoses received after inclusion
+Additional hvdat Columns
+Column	Description
+all_diagnoses	All diagnoses combined into one column
+
+------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Diagnosis Summary Table
+
+The diagnosis summary table compares questionnaire diagnoses with diagnosis registry data.
+
+Conversion Analyses
+G20 Conversion
+
+Can be analysed in:
+
+two-way mode (default)
+one-way mode
+reverse one-way mode
+Default Mode (Two-Way)
+
+A conversion is flagged if:
+
+qdat diagnosis and hvdat diagnosis do not match
+
+This includes:
+
+Diagnosis stated in qdat but absent in hvdat
+Diagnosis absent in qdat but present in hvdat
+One-Way Mode
+
+Only detects cases where:
+
+hvdat diagnosis exists
+qdat diagnosis does NOT exist
+
+Useful for identifying likely post-inclusion diagnosis development.
+
+Enable with:
+
+-dt oneway_G20
+
+or
+
+-dt oneway_E11
+Reverse One-Way Mode
+
+Only detects cases where:
+
+qdat diagnosis exists
+hvdat diagnosis does NOT exist
+
+Useful for identifying self-reported diagnoses lacking registry confirmation.
+
+Enable with:
+
+-dt onewayother_G20
+
+or
+
+-dt onewayother_E11
+
+------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Pharmacy Summary Table
+
+The table summarises:
+Medications picked up
+Number of pick-ups
+Time span of pick-ups
+Pick-up dates
+
+The pharmacy summary table summarises medication pick-up data for all individuals included in the filtered cohort.
+Filtered table displays only the medications filtered by.
+
+Filtering Relative to Inclusion Year
+
+Pharmacy data can be analysed in:
+
+upto mode
+at mode
+after mode
+
+Default Mode
+
+If no argument is provided after -pt or -ptf:
+
+all available pharmacy data is included
+
+This includes:
+
+All recorded medication pick-ups
+All available years
+All matching medications
+
+Upto Mode
+
+Only includes medication pick-ups occurring up to inclusion year.
+
+Enable with:
+
+-pt upto
+
+or
+
+-ptf upto
+
+At Mode
+
+Only includes medication pick-ups occurring around inclusion year.
+
+Enable with:
+
+-pt at
+
+or
+
+-ptf at
+
+After Mode
+
+Only includes medication pick-ups occurring after inclusion year.
+
+Useful for identifying medication use after questionnaire inclusion.
+
+Enable with:
+
+-pt after
+
+or
+
+-ptf after
+
+Filtered Pharmacy Mode
+
+The filtered pharmacy summary table only includes medications matching requested subnamn conditions from the conditions json file.
+
+Useful for:
+
+Medication-specific analyses
+Treatment stratification
+Exposure analyses
+
+Enable with:
+
+-ptf
+
+or
+
+-ptf after
 
 
-Required packages:
-python
-	pandas
-	numpy
-openpyxl
 
 
-Usage:
-The program requires the questionnaire data (qdat) and can optionally include hospital (hdat), doctoral visits (vdat), and pharmacy (pdat) data.
-It further requires the user to provide 2 json files. One with the columns/categories the output table should include
-and one with the conditions for individuals to be included in the final output table. Further details on these are described below
-and a range of example files are provided with the program on git hub.
-Besides the flags indicating input files, the program has 4 further flags that can be added in the command line.
-These and their functions are described in the section "Flags" below.
+------------------------------------------------------------------------------------------------------------------------------------------------------
 
+Error Handling
 
+The script checks for:
 
-Flags:
--o:
--s: The user can add this flag to specify the categories by which the output table should be sorted by.
-The first category stated is the main sort variable, the second the sub-sorting variable and so on.
-The categories have to be included in the categories displayed in the output table. They are to be listed without "" and separated by tab space.
--pt: The addition of this flag leads to an additional output table with pharmacy data on the patients included in the main output table.
-The pharmacy data table shows the medications (subnamn) picked up by each individual, the number of pick ups, the time span across which pick ups occurred, and the specific pick up dates.
-This flag does not take any arguments.
--dt: 
+Missing required datasets
+Invalid optional flag combinations
+Conditions/categories referencing unavailable datasets
+Empty filtered results
 
+Examples:
 
-Json files and user specifications:
-The user is required to provide
-- A json file stating the categories wanted in the output table
-- A json file stating the conditions for individuals being included in the output table
-Example files are available and can be easily modified.
+Using -pt without pdat
+Using diagnosis-derived columns without diagnosis data
+Using both -pt and -ptf
 
+------------------------------------------------------------------------------------------------------------------------------------------------------
 
-Json file formats and modifications:
-Categories:
-The json file for output table category specifications must contain a dictionary with "pdat", "qdat", and "hvdat" as keys,
-representing pharmacy, questionnaire, and hospital+doctoral visits data,
-and lists containing the requested categories from within the corresponding data sets as values.
-In qdat "Id" is to be noted as "StudieID" (the questionnaire header contains "Id").
-Conditions:
-The json file specifying the conditions under which samples are included in the output table must also contain a dictionary.
-Here the keys are the same as in the categories file.
-The values in this case are again dictionaries. These contain the category that a condition is applied to as key and a further dictionary as a value.
-The further dictionaries contain 1. "type" as a key followed by a string as a value
-and 2. "value" as key and a list stating the condition as a value.
-Depending on this condition's format in the list the string for the "type" key is either "values", "range", or "string".
-The conditions lists also allow for ">=" and "<=" in ranges and "any" (stating to exclude empty / NA entries) and "none" as strings.
-If all entries in a string list should appear, the list should start with the entry "&", which functions as a marker, stating that all (instead of any) entries must appear in the selected IDs.
+Important Notes
+If a dataset is not provided, corresponding entries must be removed from:
+categories JSON
+conditions JSON
+hdat and vdat are automatically merged internally into:
+hvdat
+Diagnosis columns are internally converted to strings because source formatting varies substantially across datasets.
 
+------------------------------------------------------------------------------------------------------------------------------------------------------
+Current Diagnosis Columns
 
-If qdat, pdat, or hdat and vdat are not provided the json entries for these are to be removed from the categories and conditions files.
+The script currently processes:
 
-
-The script calculates additional categories from combining data across the sets. These categories can be included in the json files and currently include:
-qdat:
-When hdat and/or vdat are provided:
-	Doctoral_diagnoses_at_inclusion_+-1year
-	Doctoral_diagnoses_recorded_till_inclusion_+1year
-	Doctoral_diagnoses_received_after_inclusion_year
-hvdat:
-When hdat and/or vdat are provided:
-	all_diagnoses
-
-
-
-
-
-Diagnosis table:
+hdia
+DIA1
+DIA2
 ...
-- E11 conversion is only calculated and displayed if Diabetes is added as an argument to the -dt flag
-- The conversion for both, G20 and E11, can be based on one- or both-way:
-	Both ways (default): Any case is considered "1" (conversion detected) if the qdat diagnosis and the hvdat diagnoses don't match
-						(so an individual has a diagnosis stated in qdat which is not confirmed in hvdat, or does not have a diagnosis stated in qdat which is stated in hvdat)
-	One way: Only cases that have a diagnosis in hvdat but not in qdat (Pheno_G20 is "0") are considered "1" (conversion detected).
-			 This can be used to filter e.g., for individuals that likely developed e.g. G20 after questionnaire inclusion.
-			 To use this option add oneway_G20 or oneway_E11 after the -dt flag. If other qdat diagnosis columns are requested, it can simply be listed among them.
-	Other way: Only cases that do not have a diagnosis in hvdat but have/state this diagnosis in qdat (Pheno_E11/Diabetes is "1") are considered "1" (conversion detected).
-			 This can be used to filter e.g., for individuals that stated to have Diabetes but have no confirmed diagnosis of this in hvdat.
-			 To use this option add onewayother_G20 or onewayother_E11 after the -dt flag. If other qdat diagnosis columns are requested, it can simply be listed among them.
+DIA30
 
+------------------------------------------------------------------------------------------------------------------------------------------------------
 
-
-
-Pharma table:
-- filtered based on subnamn

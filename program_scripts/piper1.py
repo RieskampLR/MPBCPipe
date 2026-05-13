@@ -270,7 +270,7 @@ thetable.to_excel(f"{(args.output + '_') if args.output else ''}filtered_table.x
 # ID list generation and saving
 #------------------------------------------------------------------------------
 
-thetable[["StudieID"]].to_csv(f"{(args.output + '_') if args.output else ''}ids_list.csv", index=False, header=False)
+thetable[["StudieID"]].to_csv(f"{(args.output + '_') if args.output else ''}ids_list.tsv", index=False, header=False)
 thetable[["StudieID"]].to_excel(f"{(args.output + '_') if args.output else ''}ids_list.xlsx", index=False, header=False)
 
 
