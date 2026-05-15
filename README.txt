@@ -105,6 +105,9 @@ python piper1.py \
 -cat, --categories		JSON file specifying output columns/categories  
 -cond, --conditions		JSON file specifying filtering conditions
 
+-cat, --categories      JSON file specifying output columns/categories  
+-cond, --conditions     JSON file specifying filtering conditions
+
 | Flag | Description |
 |------|-------------|
 | -cat, --categories | JSON file specifying output columns/categories |
