@@ -113,8 +113,8 @@ python piper1.py \
 ## Optional output & processing flags
 
 ``` -o, --output ```			Prefix added to all generated output files  
-``` -s, --sort ```				Columns to sort the final output table by  
-``` -pt, --pharma ```			Generate pharmacy summary table  
+``` -s, --sort             ```				Columns to sort the final output table by  
+``` -pt, --pharma 		   ```			Generate pharmacy summary table  
 ``` -ptf, --pharmafiltered ```	Generate filtered pharmacy summary table  
 ``` -dt, --diagnosis ```		Generate diagnosis summary table  
 
