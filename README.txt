@@ -55,24 +55,25 @@ hvdat refers to the combined vdat and hdat data.
 Install with:
 ```bash 
 pip install pandas numpy openpyxl
-
+```
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # Input pre-processing
 
 All input files must first be converted to tsv format using the provided csv_to_tsv conversion script before running the pipeline:  
+```bash
 python csv_to_tsv.py -q qdat -p pdat -hd hdat -v vdat
-
+```
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # Usage
 
 ## Basic command
-
+```bash
 python piper1.py -q qdat.tsv -cat categories.json -cond conditions.json
-
+```
 ## Full example
-
+```bash
 python piper1.py \
 -q qdat.tsv \
 -p pdat.tsv \
@@ -80,9 +81,9 @@ python piper1.py \
 -v vdat.tsv \
 -cat categories.json \
 -cond conditions.json
-
+```
 ## Example with optional flags and example flag arguments
-
+```bash
 python piper1.py \
 -q qdat.tsv \
 -p pdat.tsv \
@@ -94,15 +95,20 @@ python piper1.py \
 -s Age_Diagnosis StudieID \
 -pt after \
 -dt Diabetes oneway_G20
-
+```
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # Command line arguments
 
 ## Required arguments
 
--cat, --categories		JSON file specifying output columns/categories
+-cat, --categories		JSON file specifying output columns/categories  
 -cond, --conditions		JSON file specifying filtering conditions
+
+| Flag | Description |
+|------|-------------|
+| -cat, --categories | JSON file specifying output columns/categories |
+| -cond, --conditions | JSON file specifying filtering conditions |
 
 ## Optional input files
 
