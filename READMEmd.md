@@ -183,7 +183,7 @@ diagnosis_summary_table.tsv/xlsx	Diagnosis summary table
 
 The pipeline requires two JSON files:
 
-categories.json
+categories.json  
 conditions.json
 
 Their structuring and use are described in the following below.
