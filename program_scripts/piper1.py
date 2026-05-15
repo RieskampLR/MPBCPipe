@@ -71,8 +71,8 @@ parser.add_argument("-cat", "--categories", required=True)
 parser.add_argument("-cond", "--conditions", required=True)
 parser.add_argument("-o", "--output")
 parser.add_argument("-s", "--sort", type=str, nargs="+", help="Column to sort by")
-parser.add_argument("-pt", "--pharma", nargs="?", default=None, help="Pharma pick ups summary table (optional: upto/at/after)")
-parser.add_argument("-ptf", "--pharmafiltered", nargs="?", default=None, help="Filtered pharma pick ups summary table (optional: upto/at/after)")
+parser.add_argument("-pt", "--pharma", nargs="*", default=None, help="Pharma pick ups summary table (optional: upto/at/after)")
+parser.add_argument("-ptf", "--pharmafiltered", nargs="*", default=None, help="Filtered pharma pick ups summary table (optional: upto/at/after)")
 parser.add_argument("-dt", "--diagnosis", nargs="*", default=None, help="Diagnosis cases summary table")
 args = parser.parse_args()
 
@@ -94,6 +94,7 @@ else:
     
     
 # pharma flags set up
+
 if "-pt" in sys.argv and "-ptf" in sys.argv:
     print("Please choose either -pt or -ptf")
     exit()
@@ -145,7 +146,6 @@ else:
 
 
 
-
 # Get json file contents
 
 # chosen cats/headers
@@ -155,6 +155,12 @@ with open(cats_file, "r") as json_file:
 with open(conds_file) as json_file:
     cond = json.load(json_file)
 
+# Error catches
+
+# Requesting filtered meds in pharma table without subnamn condition
+if "-ptf" in sys.argv and "subnamn" not in cond["qdat"]:
+    print("You have no subnamn condition in your conditions JSON file. Include a subnamn condition or change -ptf to -pt in the comman line")
+    exit()
 
 # Requesting columns based on data that is not provided
 if hdat is None and vdat is None:
@@ -280,7 +286,7 @@ thetable[["StudieID"]].to_excel(f"{(args.output + '_') if args.output else ''}id
 
 # by pharma product pick up
 
-if args.pharma:
+if args.pharma is not None:
     pharma_summary = pharma_table_func(func_dats, common_ids, cond, False, incl_filter)
     pharma_summary.to_csv(f"{(args.output + '_') if args.output else ''}pharma_summary_table.tsv",
                           sep='\t', index=False, index_label=None, na_rep='NA')
@@ -289,7 +295,7 @@ if args.pharma:
 
 # filter for only those subnamn requested in conditions
 
-if args.pharmafiltered:
+if args.pharmafiltered is not None:
     pharma_summary = pharma_table_func(func_dats, common_ids, cond, True, incl_filter)
     pharma_summary.to_csv(f"{(args.output + '_') if args.output else ''}pharma_summary_table.tsv",
                           sep='\t', index=False, index_label=None, na_rep='NA')
@@ -301,7 +307,7 @@ if args.pharmafiltered:
 # Diagnosis table generation
 #------------------------------------------------------------------------------
 
-if args.diagnosis != None:
+if args.diagnosis is not None:
     if args.diagnosis != True:
         if isinstance(args.diagnosis, str):
             qdat_dias = [args.diagnosis]
