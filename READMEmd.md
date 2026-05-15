@@ -105,18 +105,18 @@ python piper1.py \
 ``` -cond, --conditions   ``` JSON file specifying filtering conditions
 
 ## Optional input files
-``` -q, --qdat   ``` Questionnaire dataset  
-``` -p, --pdat 	 ``` Pharmacy dataset  
-``` -hd, --hdat  ``` Hospital diagnosis dataset  
-``` -v, --vdat   ``` Doctoral/outpatient diagnosis dataset  
+``` -q, --qdat    ``` Questionnaire dataset  
+``` -p, --pdat    ``` Pharmacy dataset  
+``` -hd, --hdat    ``` Hospital diagnosis dataset  
+``` -v, --vdat    ``` Doctoral/outpatient diagnosis dataset  
 
 ## Optional output & processing flags
 
-``` -o, --output            ``` Prefix added to all generated output files  
-``` -s, --sort          	``` Columns to sort the final output table by  
-``` -pt, --pharma			``` Generate pharmacy summary table  
-``` -ptf, --pharmafiltered	``` Generate filtered pharmacy summary table  
-``` -dt, --diagnosis 		``` Generate diagnosis summary table  
+``` -o, --output    ``` Prefix added to all generated output files  
+``` -s, --sort    ``` Columns to sort the final output table by  
+``` -pt, --pharma    ``` Generate pharmacy summary table  
+``` -ptf, --pharmafiltered    ``` Generate filtered pharmacy summary table  
+``` -dt, --diagnosis    ``` Generate diagnosis summary table  
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -124,45 +124,47 @@ python piper1.py \
 
 ## -o
 
-Adds a prefix to all output files.
-Example: -o Parkinsons_subset
-Produces files such as:
-Parkinsons_subset_filtered_table.tsv
+Adds a prefix to all output files.  
+Example: ``` -o Parkinsons_subset    ```   
+Produces files such as:  
+Parkinsons_subset_filtered_table.tsv  
 Parkinsons_subset_ids_list.csv
 
 ## -s
 
-Sorts the final output table vertically by one or more columns.
-Syntax: -s column1 column2 column3
-The first column is the primary sort variable, the second is the secondary sort variable, etc.
-Example: -s Age_Diagnosis StudieID
+Sorts the final output table vertically by one or more columns.  
+Syntax: ``` -s column1 column2 column3    ```  
+The first column is the primary sort variable, the second is the secondary sort variable, etc.  
+Example: ``` -s Age_Diagnosis StudieID    ```  
 Important: Sort columns must also be included in the categories JSON file.
 
 ## -pt
 
-Generates a pharmacy summary table (described in further detail under Pharma summary table below).
-Optional arguments:
+Generates a pharmacy summary table (described in further detail under Pharma summary table below).  
+Optional arguments:  
+```
 upto
 at
 after
+```
 These define filtering relative to inclusion year.
-Example: -pt after
+Example: ``` -pt after    ``` 
 
 ## -ptf
 
-Same as -pt, but restricts the displayed output to pharmacy entries matching the requested subnamn conditions.
-Example: -ptf after
+Same as -pt, but restricts the displayed output to pharmacy entries matching the requested subnamn conditions.  
+Example: ``` -ptf after    ``` 
 Important: -pt and -ptf cannot be used simultaneously.
 
 ## -dt
 
-Generates a diagnosis summary table (described in further detail under Diagnosis summary table below).
+Generates a diagnosis summary table (described in further detail under Diagnosis summary table below).  
 Optional arguments can specify:
-qdat diagnosis columns to be included
-diagnosis conversion analysis modes
-Example: -dt Diabetes
-Example with conversion mode: -dt oneway_G20
-Example with multiple arguments: -dt Diabetes Depression oneway_G20
+- qdat diagnosis columns to be included
+- diagnosis conversion analysis modes
+Example: ```-dt Diabetes    ``` 
+Example with conversion mode: ``` -dt oneway_G20    ``` 
+Example with multiple arguments: ``` -dt Diabetes Depression oneway_G20    ``` 
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 
