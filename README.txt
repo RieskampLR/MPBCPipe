@@ -101,10 +101,9 @@ python piper1.py \
 # Command line arguments
 
 ## Required arguments
-```
--cat, --categories		JSON file specifying output columns/categories  
+``` -cat, --categories	```	JSON file specifying output columns/categories  
 -cond, --conditions		JSON file specifying filtering conditions
-```
+
 ## Optional input files
 
 -q, --qdat				Questionnaire dataset
