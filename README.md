@@ -291,12 +291,10 @@ Basic example:
 Where the outer limit values, 20 and 40, are included in the selected range.
 
 #### Supported operators:
-```
->=
-<=
->
-<
-```
+```>=```  
+```<=```  
+```>```  
+```<```  
 Example:
 ```
 {
@@ -347,7 +345,7 @@ Filters for all individuals that have G20 AND have any diagnosis starting with E
 
 #### Special Conditions:
 
-__any__  
+any:  
 Includes only non-empty entries.  
 Example:
 ```
@@ -358,7 +356,7 @@ Example:
   }
 }
 ```
-__none__  
+none:  
 Matches empty and na entries.  
 Example:
 ```
@@ -397,9 +395,9 @@ The columns can be requested by the user by simply adding their header in the ca
 
 Columns, their content, and under which key to include in the JSON file:
 
-```all_diagnoses```										All diagnoses an individual received combined into one column; hvdat
-```Doctoral_diagnoses_at_inclusion_+-1year```				Diagnoses at inclusion year in qdat +-1 year; qdat
-```Doctoral_diagnoses_recorded_till_inclusion_+1year```	Diagnoses recorded up to inclusion in qdat +1 year; qdat
+```all_diagnoses```										All diagnoses an individual received combined into one column; hvdat  
+```Doctoral_diagnoses_at_inclusion_+-1year```				Diagnoses at inclusion year in qdat +-1 year; qdat  
+```Doctoral_diagnoses_recorded_till_inclusion_+1year```	Diagnoses recorded up to inclusion in qdat +1 year; qdat  
 ```Doctoral_diagnoses_received_after_inclusion_year```	Diagnoses received after inclusion in qdat; qdat
 
 Inclusion years vary by individual. The program automatically adjusts for this per individual.  
@@ -417,13 +415,13 @@ The optionally generated pharmacy summary table:
 ## Filtering medications displayed
 
 The user can request the table to list all or list only the medications that the cohort was filtered by via the JSON file subnamn conditions.  
-This is done by adjustment of the command line flag:
--pt for a table displaying all medications the filtered individuals picked up
--ptf for a filtered table displaying only the medications the individuals were filtered by
+This is done by adjustment of the command line flag:  
+```-pt``` for a table displaying all medications the filtered individuals picked up  
+```-ptf``` for a filtered table displaying only the medications the individuals were filtered by
 
 E.g., if the data was filtered for only individuals that received Levodopa and/or Metformin,  
-the -pt flag generates a table showing all medications these individuals received,  
-the -ptf flag generates a table with only the Levodopa and Metformin rows for these individuals
+```-pt``` generates a table showing all medications these individuals received,  
+```-ptf``` generates a table with only the Levodopa and Metformin rows for these individuals
 
 ## Filtering relative to inclusion year in qdat
 
@@ -536,9 +534,9 @@ The script checks for:
 - Empty filtered results (no individuals meet the user-defined requirements)
 
 Examples:  
-Using -pt without pdat  
+Using ```-pt``` without pdat  
 Using diagnosis-derived columns without diagnosis data  
-Using both -pt and -ptf  
+Using both ```-pt``` and ```-ptf```  
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 
