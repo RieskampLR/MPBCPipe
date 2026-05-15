@@ -2,14 +2,14 @@
 
 Version: 1.00  
 Date: 2026-02-28  
-Author: Lea Rachel Rieskamp  
-Supervision: Maria Swanberg, Translational Neurogenetics Lab, Lund University  
+Author: Lea Rachel Rieskamp
+Supervision: Maria Swanberg, Translational Neurogenetics Lab, Lund University
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # Overview
 
-piper1.py is a flexible Python pipeline for filtering, combining, stratifying, and summarising clinical and registry data used in Parkinson's disease research.  
+piper1.py is a flexible Python pipeline for filtering, combining, stratifying, and summarising clinical and registry data used in Parkinson's disease research.
 The script integrates questionnaire, diagnosis, and pharmacy datasets and enables users to:
 
 - Identify individuals matching user-defined conditions
@@ -39,7 +39,7 @@ The pipeline currently supports the following datasets:
 - UT_R_PAR_SV_14691_2021						(Hospital diagnosis registry )
 - UT_R_PAR_OV_14691_2021						(Outpatient/doctoral visit diagnosis registry)
 
-For efficiency purposes these are referred to in my script and the following descriptions as qdat, pdat, hdat, and vdat, respectively.  
+For efficiency purposes these are referred to in my script and the following descriptions as qdat, pdat, hdat, and vdat, respectively.
 hvdat refers to the combined vdat and hdat data.
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -53,27 +53,25 @@ hvdat refers to the combined vdat and hdat data.
 - openpyxl
 
 Install with:
-```bash 
 pip install pandas numpy openpyxl
-```
+
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # Input pre-processing
 
-All input files must first be converted to tsv format using the provided csv_to_tsv conversion script before running the pipeline:  
-```bash
+All input files must first be converted to tsv format using the provided csv_to_tsv conversion script before running the pipeline:
 python csv_to_tsv.py -q qdat -p pdat -hd hdat -v vdat
-```
+
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # Usage
 
 ## Basic command
-```bash
+
 python piper1.py -q qdat.tsv -cat categories.json -cond conditions.json
-```
+
 ## Full example
-```bash
+
 python piper1.py \
 -q qdat.tsv \
 -p pdat.tsv \
@@ -81,9 +79,9 @@ python piper1.py \
 -v vdat.tsv \
 -cat categories.json \
 -cond conditions.json
-```
+
 ## Example with optional flags and example flag arguments
-```bash
+
 python piper1.py \
 -q qdat.tsv \
 -p pdat.tsv \
@@ -95,28 +93,30 @@ python piper1.py \
 -s Age_Diagnosis StudieID \
 -pt after \
 -dt Diabetes oneway_G20
-```
+
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # Command line arguments
 
 ## Required arguments
-``` -cat, --categories ``` JSON file specifying output columns/categories  
-``` -cond, --conditions ``` JSON file specifying filtering conditions
+
+-cat, --categories		JSON file specifying output columns/categories
+-cond, --conditions		JSON file specifying filtering conditions
 
 ## Optional input files
-``` -q, --qdat ```				Questionnaire dataset  
-``` -p, --pdat ```				Pharmacy dataset  
-``` -hd, --hdat ```				Hospital diagnosis dataset  
-``` -v, --vdat ```				Doctoral/outpatient diagnosis dataset  
+
+-q, --qdat				Questionnaire dataset
+-p, --pdat				Pharmacy dataset
+-hd, --hdat				Hospital diagnosis dataset
+-v, --vdat				Doctoral/outpatient diagnosis dataset
 
 ## Optional output & processing flags
 
-``` -o, --output ```			Prefix added to all generated output files  
-``` -s, --sort             ```				Columns to sort the final output table by  
-``` -pt, --pharma 		   ```			Generate pharmacy summary table  
-``` -ptf, --pharmafiltered ```	Generate filtered pharmacy summary table  
-``` -dt, --diagnosis ```		Generate diagnosis summary table  
+-o, --output			Prefix added to all generated output files
+-s, --sort				Columns to sort the final output table by
+-pt, --pharma			Generate pharmacy summary table
+-ptf, --pharmafiltered	Generate filtered pharmacy summary table
+-dt, --diagnosis		Generate diagnosis summary table
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -184,7 +184,7 @@ diagnosis_summary_table.tsv/xlsx	Diagnosis summary table
 
 The pipeline requires two JSON files:
 
-categories.json  
+categories.json
 conditions.json
 
 Their structuring and use are described in the following below.
