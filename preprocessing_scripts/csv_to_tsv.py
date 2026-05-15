@@ -2,7 +2,7 @@
 """
 original csv files to tsv format
 
-python csv_to_tsv.py qdat pdat hdat vdat
+python csv_to_tsv.py -q qdat -p pdat -hd hdat -v vdat
 
 """
 

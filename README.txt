@@ -2,14 +2,14 @@
 
 Version: 1.00  
 Date: 2026-02-28  
-Author: Lea Rachel Rieskamp
-Supervision: Maria Swanberg, Translational Neurogenetics Lab, Lund University
+Author: Lea Rachel Rieskamp  
+Supervision: Maria Swanberg, Translational Neurogenetics Lab, Lund University  
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # Overview
 
-piper1.py is a flexible Python pipeline for filtering, combining, stratifying, and summarising clinical and registry data used in Parkinson's disease research.
+piper1.py is a flexible Python pipeline for filtering, combining, stratifying, and summarising clinical and registry data used in Parkinson's disease research.  
 The script integrates questionnaire, diagnosis, and pharmacy datasets and enables users to:
 
 - Identify individuals matching user-defined conditions
@@ -39,7 +39,7 @@ The pipeline currently supports the following datasets:
 - UT_R_PAR_SV_14691_2021						(Hospital diagnosis registry )
 - UT_R_PAR_OV_14691_2021						(Outpatient/doctoral visit diagnosis registry)
 
-For efficiency purposes these are referred to in my script and the following descriptions as qdat, pdat, hdat, and vdat, respectively.
+For efficiency purposes these are referred to in my script and the following descriptions as qdat, pdat, hdat, and vdat, respectively.  
 hvdat refers to the combined vdat and hdat data.
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -53,13 +53,15 @@ hvdat refers to the combined vdat and hdat data.
 - openpyxl
 
 Install with:
+```bash 
 pip install pandas numpy openpyxl
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # Input pre-processing
 
-All input files must first be converted to tsv format using the provided csv_to_tsv conversion script before running the pipeline.
+All input files must first be converted to tsv format using the provided csv_to_tsv conversion script before running the pipeline:  
+python csv_to_tsv.py -q qdat -p pdat -hd hdat -v vdat
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -183,7 +185,7 @@ diagnosis_summary_table.tsv/xlsx	Diagnosis summary table
 
 The pipeline requires two JSON files:
 
-categories.json
+categories.json  
 conditions.json
 
 Their structuring and use are described in the following below.
