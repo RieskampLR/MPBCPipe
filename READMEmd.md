@@ -141,19 +141,17 @@ Important: Sort columns must also be included in the categories JSON file.
 ## -pt
 
 Generates a pharmacy summary table (described in further detail under Pharma summary table below).  
-Optional arguments:  
-```
-upto
-at
-after
-```
+Optional arguments:
+``` upto ```  
+``` at ```  
+``` after ```  
 These define filtering relative to inclusion year.
 Example: ``` -pt after    ``` 
 
 ## -ptf
 
 Same as -pt, but restricts the displayed output to pharmacy entries matching the requested subnamn conditions.  
-Example: ``` -ptf after    ``` 
+Example: ``` -ptf after    ```  
 Important: -pt and -ptf cannot be used simultaneously.
 
 ## -dt
