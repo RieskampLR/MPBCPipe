@@ -101,22 +101,22 @@ python piper1.py \
 # Command line arguments
 
 ## Required arguments
-``` -cat, --categories ``` JSON file specifying output columns/categories  
+``` -cat, --categories  ``` JSON file specifying output columns/categories  
 ``` -cond, --conditions ``` JSON file specifying filtering conditions
 
 ## Optional input files
-``` -q, --qdat ```				Questionnaire dataset  
-``` -p, --pdat ```				Pharmacy dataset  
-``` -hd, --hdat ```				Hospital diagnosis dataset  
-``` -v, --vdat ```				Doctoral/outpatient diagnosis dataset  
+``` -q, --qdat 			``` Questionnaire dataset  
+``` -p, --pdat 			``` Pharmacy dataset  
+``` -hd, --hdat 		```	Hospital diagnosis dataset  
+``` -v, --vdat 			``` Doctoral/outpatient diagnosis dataset  
 
 ## Optional output & processing flags
 
-``` -o, --output ```			Prefix added to all generated output files  
-``` -s, --sort             ```				Columns to sort the final output table by  
-``` -pt, --pharma 		   ```			Generate pharmacy summary table  
-``` -ptf, --pharmafiltered ```	Generate filtered pharmacy summary table  
-``` -dt, --diagnosis ```		Generate diagnosis summary table  
+``` -o, --output            ``` Prefix added to all generated output files  
+``` -s, --sort          	``` Columns to sort the final output table by  
+``` -pt, --pharma 			``` Generate pharmacy summary table  
+``` -ptf, --pharmafiltered  ``` Generate filtered pharmacy summary table  
+``` -dt, --diagnosis 		``` Generate diagnosis summary table  
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 
