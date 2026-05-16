@@ -1,4 +1,4 @@
-# MultiParkPiper
+# ParkinsonsPiper
 
 Version: 1.00  
 Date: 2026-02-28  
@@ -104,8 +104,9 @@ python piper1.py \
 ``` -cat, --categories    ``` JSON file specifying output columns/categories  
 ``` -cond, --conditions   ``` JSON file specifying filtering conditions
 
-## Optional input files
+## Input data files
 ``` -q, --qdat    ``` Questionnaire dataset  
+Optional:  
 ``` -p, --pdat    ``` Pharmacy dataset  
 ``` -hd, --hdat    ``` Hospital diagnosis dataset  
 ``` -v, --vdat    ``` Doctoral/outpatient diagnosis dataset  
