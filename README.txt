@@ -400,9 +400,9 @@ The diagnoses are only based on hdat and vdat (diagnoses stated by an individual
 # Pharmacy summary table
 
 The optionally generated pharmacy summary table:
-- Gives an medication-focussed overview of the filtered data
-- Displays each medication (based on substance name ("subnamn")) picked up by an individual from the pharmacy in a separate row,
-  together with information on the number of picked-ups, each pick-up date, and the overall time span of these
+- Gives a medication-focussed overview of the filtered data
+- Displays each medication (based on substance name ("subnamn")) collected by an individual from the pharmacy in a separate row,
+  together with information on the number of collections, each collection date, and the overall time span of these
 
 ## Filtering medications displayed
 
@@ -429,7 +429,6 @@ Modes:
 
 All (default)
 All available pharmacy data is included
-Use: No argument provided after -pt or -ptf
 
 Upto mode
 Only includes medication pick-ups occurring up to inclusion +1 year
@@ -457,7 +456,7 @@ or
 # Diagnosis summary table
 
 The optionally generated diagnosis summary table:
-- Gives an diagnosis-focussed overview of the filtered data
+- Gives a diagnosis-focussed overview of the filtered data
 - Compares questionnaire diagnoses with diagnosis registry data
 - Displays each diagnosis an individual received in a separate row, together with information on
   deviations from qdat, selected qdat columns, number of times diagnosed, each diagnosis date, the overall time span of these
