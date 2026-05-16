@@ -120,12 +120,21 @@ conds_file = Path("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/conds_4
 
 # Error catches
 
+print(sys.argv)
+
+
+# Missing qdat
+if qdat is None:
+    print("Please provide questionnaire data.")
+    exit()
+
 # Requesting Diagnosis table with no diagnosis data
 if hdat is None and vdat is None:
     if args.diagnosis:
         print("Please provide diagnosis data for the diagnosis summary table generation.\nIf no diagnosis data is available, please remove the -dt flag in the command line.")
         exit()
 
+# Requesting Pharma table with no pharma data
 if pdat is None:
     if args.pharma:
         print("Please provide pharmacy data for the pharmacy summary table generation.\nIf no pharmacy data is available, please remove the -pt flag in the command line.")
