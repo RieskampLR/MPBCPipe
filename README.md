@@ -106,7 +106,7 @@ python piper1.py \
 
 ## Input data files
 ``` -q, --qdat    ``` Questionnaire dataset  
-Optional:  
+### Optional:  
 ``` -p, --pdat    ``` Pharmacy dataset  
 ``` -hd, --hdat    ``` Hospital diagnosis dataset  
 ``` -v, --vdat    ``` Doctoral/outpatient diagnosis dataset  
