@@ -1,0 +1,12 @@
+{
+  "qdat":
+  ["StudieID",
+  "Pesticides",
+  "Pesticides_Days",
+  "Farmer"
+  ],
+  "pdat": 
+  [],
+  "hvdat":
+  ["all_diagnoses"]
+}
