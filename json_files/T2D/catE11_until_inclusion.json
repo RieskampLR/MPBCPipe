@@ -1,0 +1,10 @@
+{
+  "qdat":
+  ["StudieID",
+  "PHENO",
+  "Control",
+  "Diabetes",
+  "Doctoral_diagnoses_recorded_till_inclusion_+1year"],
+  "hvdat":
+  ["all_diagnoses"]
+}

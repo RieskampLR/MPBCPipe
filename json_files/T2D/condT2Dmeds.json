@@ -1,0 +1,7 @@
+{
+  "qdat": {
+  },
+  "pdat": {
+  "subnamn": {"type": "string", "values":["...","...", ...]}
+  }
+}

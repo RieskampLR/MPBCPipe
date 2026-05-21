@@ -120,9 +120,6 @@ conds_file = Path("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/conds_4
 
 # Error catches
 
-print(sys.argv)
-
-
 # Missing qdat
 if qdat is None:
     print("Please provide questionnaire data.")
