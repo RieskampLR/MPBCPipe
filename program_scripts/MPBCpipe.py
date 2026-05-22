@@ -3,7 +3,7 @@
 
 
 """
-piper1.py
+MPBCpipe.py
 
 Description:
     dias before/at/after inclusion year in qdat currently refer to hdia!
@@ -30,7 +30,7 @@ Procedure:
 Input: 
 Output: 
 
-Usage: python piper1.py -q qdat_anonymised.tsv -p pdat_anonymised.tsv -hd hdat_anonymised.tsv -v vdat_anonymised.tsv -cat cats_4.json -cond conds_4.json
+Usage: python MPBCpipe.py -q qdat_anonymised.tsv -p pdat_anonymised.tsv -hd hdat_anonymised.tsv -v vdat_anonymised.tsv -cat cats_4.json -cond conds_4.json
 
 Version: 1.00
 Date: 2026-02-28
@@ -108,16 +108,6 @@ else:
     
 
 
-'''   For direct use in Spyder only
-qdat = pd.read_table(Path("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/qdat_anonymised.tsv"))
-pdat = pd.read_table(Path("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/pdat_anonymised.tsv"), encoding='unicode_escape')
-hdat = pd.read_table(Path("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/hdat_anonymised.tsv"), encoding='unicode_escape', low_memory=False)
-vdat = pd.read_table(Path("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/vdat_anonymised.tsv"), encoding='unicode_escape', low_memory=False)
-cats_file = Path("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/cats_4.json")
-conds_file = Path("C:/Users/admin/OneDrive/Dokumente/UniLund/Thesis/dats/conds_4.json")
-
-'''
-
 # Error catches
 
 # Missing qdat
@@ -164,7 +154,7 @@ with open(conds_file) as json_file:
 # Error catches
 
 # Requesting filtered meds in pharma table without subnamn condition
-if "-ptf" in sys.argv and "subnamn" not in cond["qdat"]:
+if "-ptf" in sys.argv and "subnamn" not in cond["pdat"]:
     print("You have no subnamn condition in your conditions JSON file. Include a subnamn condition or change -ptf to -pt in the comman line")
     exit()
 
