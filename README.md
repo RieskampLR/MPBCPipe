@@ -272,6 +272,11 @@ dataset --> column/category --> condition imposed on it
   "hvdat": {}
 }
 ```
+qdat: Questionnaire data
+pdat: Medication collections data
+hvdat: In- and outpatient data
+
+
 ! qdat must always be included. If no conditions are imposed on it leave the dictionary empty as seen in the basic structure above.
 
 ## Condition setting format

@@ -229,6 +229,10 @@ The file contains a simple dictionary with dataset names as keys and lists of co
   "hvdat": []
 }
 
+qdat: Questionnaire data
+pdat: Medication collections data
+hvdat: In- and outpatient data
+
 ## Example:
 
 {
@@ -269,6 +273,10 @@ dataset --> column/category --> condition imposed on it
   "pdat": {},
   "hvdat": {}
 }
+
+qdat: Questionnaire data
+pdat: Medication collections data
+hvdat: In- and outpatient data
 
 ! qdat must always be included. If no conditions are imposed on it leave the dictionary empty as seen in the basic structure above.
 
