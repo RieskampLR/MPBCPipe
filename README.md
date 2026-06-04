@@ -55,10 +55,10 @@ The program is currently used in the Translational Neurogenetics Lab at Lund Uni
 
 The pipeline currently supports the following datasets:
 
-- QuestionnaireData_N1864_FINAL_CLEANED_210621	(Questionnaire / phenotype data)
-- UT_R_LMED_14691_2021							(Medication pick-up registry )
-- UT_R_PAR_SV_14691_2021						(Hospital diagnosis registry )
-- UT_R_PAR_OV_14691_2021						(Outpatient/doctoral visit diagnosis registry)
+- QuestionnaireData_N1864_FINAL_CLEANED_210621	(Questionnaire / phenotype data, qdat)
+- UT_R_LMED_14691_2021							(Medication collections registry, pdat )
+- UT_R_PAR_SV_14691_2021						(Hospital diagnosis registry, hdat )
+- UT_R_PAR_OV_14691_2021						(Outpatient/doctoral visit diagnosis registry, vdat)
 
 For efficiency purposes these are referred to in my script and the following descriptions as qdat, pdat, hdat, and vdat, respectively.  
 hvdat refers to the combined vdat and hdat data.
@@ -227,6 +227,11 @@ The file contains a simple dictionary with dataset names as keys and lists of co
   "hvdat": []
 }
 ```
+**Legend:**  
+qdat: Questionnaire
+pdat: Medication collections
+hdat: Hospitalisations
+vdat: Visit at doctoral practice
 
 ## Example:
 ```
@@ -440,7 +445,7 @@ The optionally generated pharmacy summary table:
 
 The user can request the table to list all or list only the medications that the cohort was filtered by via the JSON file subnamn conditions.  
 This is done by adjustment of the command line flag:  
-```-pt``` for a table displaying all medications the filtered individuals picked up  
+```-pt``` for a table displaying all medications the filtered individuals collected at the pharmacy  
 ```-ptf``` for a filtered table displaying only the medications the individuals were filtered by
 
 E.g., if the data was filtered for only individuals that received Levodopa and/or Metformin,  
@@ -449,7 +454,7 @@ E.g., if the data was filtered for only individuals that received Levodopa and/o
 
 ## Filtering relative to inclusion year in qdat
 
-The pharmacy table can also be filtered to include only medications picked up before, around, or after the year an individual was included in qdat.
+The pharmacy table can also be filtered to include only medications collected before, around, or after the year an individual was included in qdat.
 
 Modes:
 - all (default)
@@ -461,21 +466,21 @@ All (default)
 All available pharmacy data is included
 
 Upto mode  
-Only includes medication pick-ups occurring up to inclusion +1 year  
+Only includes medication collections occurring up to inclusion +1 year  
 Use:  
 ```-pt upto```  
 or  
 ```-ptf upto```
 
 At mode  
-Only includes medication pick-ups occurring at inclusion +-1 year  
+Only includes medication collections occurring at inclusion +-1 year  
 Use:  
 ```-pt at```  
 or  
 ```-ptf at```  
 
 After mode  
-Only includes medication pick-ups occurring after the inclusion year  
+Only includes medication collections occurring after the inclusion year  
 Use:  
 ```-pt after```  
 or  
