@@ -226,12 +226,10 @@ The file contains a simple dictionary with dataset names as keys and lists of co
   "pdat": [],
   "hvdat": []
 }
-```
-**Legend:**  
-qdat: Questionnaire
-pdat: Medication collections
-hdat: Hospitalisations
-vdat: Visit at doctoral practice
+``` 
+qdat: Questionnaire data  
+pdat: Medication collections data  
+hvdat: In- and outpatient data
 
 ## Example:
 ```
