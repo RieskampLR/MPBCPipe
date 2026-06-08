@@ -10,9 +10,9 @@ import re
 
 # Helper function for regex matching and going through list entries and handling single strings
 def match(v, x):
-    if x is None or (isinstance(x, float) and pd.isna(x)): # handles NaNs (cause re.fullmatch sees them as floats)
+    if x is None or (isinstance(x, float) and pd.isna(x)): # handles NaNs (cause re. sees them as floats)
         return False
-    return any(re.fullmatch(v, str(item)) for item in (x if isinstance(x, list) else [x]))
+    return any(re.search(v, str(item)) for item in (x if isinstance(x, list) else [x]))
 
 
 def id_selection_func(tables, cond):
@@ -24,7 +24,11 @@ def id_selection_func(tables, cond):
         filters = cond[table]
         ids = tables[table]
         
+        if table in ["pdat", "hvdat"]: ids = ids.groupby("StudieID").agg(list).reset_index() # For pdat and hvdat data (where ID data can be across rows)
+        
         for col, val in filters.items():
+            
+            # print(len(ids["StudieID"])) for viewing each filter's ID-reduction
             
             # ----------------------------range--------------------------------
             if val["type"] == "range":
@@ -62,7 +66,12 @@ def id_selection_func(tables, cond):
             else:
                 ids = ids[ids[col].isin(val["values"])]
                     
-        ids["StudieID"] = ids["StudieID"].apply(lambda x: x[0] if isinstance(x, list) else x) # Ensuring all IDs are string entries (not lists)
+        if len(ids["StudieID"]) == 0:
+            print(f"There are no patients meeting your {table} conditions")
+            exit()
+        else:
+            ids["StudieID"] = ids["StudieID"].apply(lambda x: x[0] if isinstance(x, list) else x) # Ensuring all IDs are string entries (not lists)
+
         id_selection[table] = ids["StudieID"]
 
 

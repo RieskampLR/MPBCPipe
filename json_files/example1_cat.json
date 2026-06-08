@@ -1,0 +1,15 @@
+{
+  "qdat":
+  ["StudieID",
+  "PHENO",
+  "sex",
+  "Age_Inclusion",
+  "City",
+  "Doctoral_diagnoses_recorded_till_inclusion_+1year"],
+  "pdat": 
+  ["ATC",
+  "produkt",
+  "subnamn"],
+  "hvdat":
+  ["all_diagnoses"]
+}

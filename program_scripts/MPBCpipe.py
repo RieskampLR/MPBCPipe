@@ -234,7 +234,7 @@ tables = {key: val for key, val in {
 common_ids = id_selection_func(tables, cond)
 
 if not common_ids:
-    print("There are no patients in your given data that meet all your conditions.")
+    print("There are no patients meeting all your conditions.")
     exit()
 
 
