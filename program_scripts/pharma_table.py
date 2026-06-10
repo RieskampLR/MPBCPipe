@@ -24,6 +24,7 @@ def pharma_table_func(func_dats, common_ids, cond, filtered, incl_filter):
     substance_info_rows = []
     for (stu_id, prod), group in grouped:
         incl_year = incl_map.get(stu_id)
+        atc = group["ATC"].iloc[0]
         # upto+1 incl_year filter
         if incl_filter == "upto":
             group = group[pd.to_datetime(group["EDATUM"]) <= pd.to_datetime(f"{incl_year+1}-12-31")] # exclude all dates out of range
@@ -36,12 +37,12 @@ def pharma_table_func(func_dats, common_ids, cond, filtered, incl_filter):
             group = group[pd.to_datetime(group["EDATUM"]) > pd.to_datetime(f"{incl_year}-12-31")] 
         dates = sorted(group["EDATUM"].tolist())   # all pickup dates for this ID+substance in order
         count = len(dates)               # number of pickups
-        substance_info_rows.append([stu_id, prod, count] + dates)  
+        substance_info_rows.append([stu_id, prod, atc, count] + dates)  
     
     # Collect diagnosis cases info
     pharma_summary = pd.DataFrame(substance_info_rows)
     # Col headers
-    pharma_summary.columns = ["StudieID", "subnamn", "number_of_pickups"] + list(pharma_summary.columns[3:])
+    pharma_summary.columns = ["StudieID", "subnamn", "ATC", "number_of_pickups"] + list(pharma_summary.columns[4:])
     pharma_summary = pharma_summary[pharma_summary["number_of_pickups"] != 0]
     
     # Time frame column
@@ -68,7 +69,10 @@ def pharma_table_func(func_dats, common_ids, cond, filtered, incl_filter):
     
     # Filter option for displayed subnamn entries
     if filtered == True:
-        pharma_summary = pharma_summary[pharma_summary["subnamn"].isin(cond["pdat"]["subnamn"]["values"])]
+        pharma_summary = pharma_summary[
+            pharma_summary["subnamn"].str.contains("|".join(cond["pdat"]["subnamn"]["values"]), regex=True, na=False) |
+            pharma_summary["ATC"].str.contains("|".join(cond["pdat"]["ATC"]["values"]), regex=True, na=False)
+        ]
             
     if incl_filter is not None:
         # Add incl year col

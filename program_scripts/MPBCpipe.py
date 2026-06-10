@@ -155,7 +155,7 @@ with open(conds_file) as json_file:
 
 # Requesting filtered meds in pharma table without subnamn condition
 if "-ptf" in sys.argv and "subnamn" not in cond["pdat"]:
-    print("You have no subnamn condition in your conditions JSON file. Include a subnamn condition or change -ptf to -pt in the comman line")
+    print("You have no subnamn condition in your conditions JSON file. Include a subnamn condition or change -ptf to -pt in the command line")
     exit()
 
 # Requesting columns based on data that is not provided
