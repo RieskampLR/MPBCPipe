@@ -1,0 +1,8 @@
+{
+  "qdat": {},
+  "pdat": {
+  "subnamn": {"type": "string", "values": ["Levodopa.*"]},
+  "ATC": {"type": "string", "values":["^N06A.*"]}
+  },
+  "hvdat": {}
+}

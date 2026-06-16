@@ -440,8 +440,7 @@ The diagnoses are only based on hdat and vdat (diagnoses stated by an individual
 
 The optionally generated pharmacy summary table:
 - Gives a medication-focussed overview of the filtered data
-- Displays each medication (based on substance name ("subnamn")) collected by an individual from the pharmacy in a separate row,  
-  together with information on the number of collections, each collection date, and the overall time span of these
+- Displays each medication (based on substance name ("subnamn")) collected by an individual from the pharmacy in a separate row, together with information on the number of collections, each collection date, and the overall time span of these
 
 ## Filtering medications displayed
 

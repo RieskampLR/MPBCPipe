@@ -1,0 +1,7 @@
+{
+  "qdat": {},
+  "pdat": {},
+  "hvdat": {
+	  	  "all_diagnoses": {"type": "string", "values": ["G20"]}
+  }
+}

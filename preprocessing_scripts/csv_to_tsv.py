@@ -26,8 +26,8 @@ vdat = pd.read_table(Path(args.vdat), encoding='unicode_escape', low_memory=Fals
 
 
 if qdat is not None:
-    qdat = qdat.drop("Unnamed: 0", axis=1)
-    qdat = qdat.convert_dtypes()
+    qdat = qdat.drop("Unnamed: 0", axis=1)  # remove index col
+    qdat = qdat.convert_dtypes()            # convert cols to supported pandas data types
     qdat.to_csv("qdat.tsv", sep='\t', index=False, index_label=None, na_rep='NA')
 if pdat is not None:
     pdat = pdat.convert_dtypes()

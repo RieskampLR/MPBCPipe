@@ -1,0 +1,10 @@
+{
+  "qdat": {
+  "sex": {"type": "string", "values": ["1"]},
+  "City": {"type": "string", "values": ["Lund"]},
+  "Age_Inclusion": {"type": "range", "values": ["<=", 70]},
+  "Doctoral_diagnoses_recorded_till_inclusion_+1year": {"type": "string", "values": ["E11"]}
+  },
+  "pdat": {},
+  "hvdat": {}
+}
