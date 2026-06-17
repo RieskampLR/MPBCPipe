@@ -48,8 +48,8 @@ def pharma_table_func(func_dats, common_ids, cond, filtered, incl_filter):
     # Time frame column
     # Get date col names
     pharma_cols = pharma_summary.columns.tolist()
-    for i in range(3, len(pharma_summary.columns)):
-        pharma_cols[i] = f'Date_{i-2}'
+    for i in range(4, len(pharma_summary.columns)):
+        pharma_cols[i] = f'Date_{i-3}'
     # Add to table
     pharma_summary.columns = pharma_cols
     date_cols = pharma_summary.columns[4:]
