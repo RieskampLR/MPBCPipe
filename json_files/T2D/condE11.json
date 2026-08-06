@@ -1,7 +1,0 @@
-{
-  "qdat": {
-  },
-  "hvdat": {
-	  "all_diagnoses": {"type": "string", "values":["E11"]}
-  }
-}

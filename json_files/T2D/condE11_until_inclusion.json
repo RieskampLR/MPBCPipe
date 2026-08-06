@@ -1,8 +1,0 @@
-{
-  "qdat": {
-  "Doctoral_diagnoses_recorded_till_inclusion_+1year": {"type": "string", "values": ["E11"]}
-  },
-  "hvdat": {
-	  "all_diagnoses": {"type": "string", "values":["E11"]}
-  }
-}

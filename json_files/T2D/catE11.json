@@ -1,9 +1,0 @@
-{
-  "qdat":
-  ["StudieID",
-  "PHENO",
-  "Control",
-  "Diabetes"],
-  "hvdat":
-  ["all_diagnoses"]
-}
