@@ -1,0 +1,9 @@
+{
+  "qdat":
+  ["StudieID",
+  "PHENO"],
+  "pdat": 
+  [],
+  "hvdat":
+  ["all_diagnoses"]
+}

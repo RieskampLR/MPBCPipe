@@ -1,0 +1,9 @@
+{
+  "qdat": {
+  },
+  "pdat": {
+  "subnamn": {"type": "string", "values": ["Metformin", "Empagliflozin", "Dapaglifozin", "Kanagliflozin", "Ertugliflozin", "Liraglutid", "Semaglutid", "Dulaglutid", "Lixisenatid", "Sitagliptin", "Vildagliptin", "Saxagliptin", "Linagliptin", "Pioglitazon", "Glimepirid", "Repaglinid", "Insulin", "Insulin (humant)", "Insulin ."]}
+  },
+  "hvdat": {
+  }
+}
